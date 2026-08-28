@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  BUYER
+  MECHANIC
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(BUYER)
+  status    String   @default("PENDING") // PENDING, ACTIVE, SUSPENDED
+  documents String[] // Array of document URLs for verification
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Seller specific
+  products  Product[]
+  
+  // Buyer/Mechanic specific
+  orders    Order[]
+
+  // Mechanic specific
+  bookings  Booking[] @relation("MechanicBookings")
+  bookedBy  Booking[] @relation("UserBookings")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  stock       Int
+  sellerId    String
+  seller      User     @relation(fields: [sellerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  status        OrderStatus @default(PENDING)
+  totalAmount   Float
+  commissionFee Float       @default(0) // Admin static %
+  importFee     Float       @default(0) // Admin static %
+  taxFee        Float       @default(0) // Admin static %
+  deliveryFee   Float       @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float // price at the time of order
+}
+
+model Booking {
+  id          String   @id @default(uuid())
+  mechanicId  String
+  mechanic    User     @relation("MechanicBookings", fields: [mechanicId], references: [id])
+  userId      String
+  user        User     @relation("UserBookings", fields: [userId], references: [id])
+  serviceDate DateTime
+  status      String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Settings {
+  id                String @id @default("global")
+  commissionPercent Float  @default(5.0)
+  importTaxPercent  Float  @default(16.0)
+}
