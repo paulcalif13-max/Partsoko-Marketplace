@@ -1,9 +1,7 @@
 {
   "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
   "/services/value-car/page": "app/services/value-car/page.js",
-  "/checkout/page": "app/checkout/page.js",
-  "/services/logbook-financing/page": "app/services/logbook-financing/page.js",
   "/events/page": "app/events/page.js",
+  "/services/logbook-financing/page": "app/services/logbook-financing/page.js",
   "/search/page": "app/search/page.js"
 }
