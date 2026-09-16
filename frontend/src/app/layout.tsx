@@ -38,6 +38,9 @@ export default function RootLayout({
               <div className="absolute left-0 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-300 z-50">
                 <div className="bg-white rounded-md shadow-lg overflow-hidden border border-gray-100">
                   <a href="/services/finance" className="block px-4 py-3 text-sm font-bold text-gray-900 bg-blue-50 border-b border-gray-100 hover:bg-blue-100 transition">Finance Hub</a>
+                  <a href="/services/towing" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition border-b border-gray-50 flex justify-between items-center">
+                    Towing & Recovery <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">24/7</span>
+                  </a>
                   <a href="/services/insure-car" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">Insure Your Car</a>
                   <a href="/services/value-car" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">Value Your Car</a>
                 </div>
@@ -68,7 +71,7 @@ export default function RootLayout({
                   <li><a href="/search" className="hover:text-primary transition">Parts & Accessories</a></li>
                   <li><a href="#" className="hover:text-primary transition">Brand New</a></li>
                   <li><a href="/services/value-car" className="hover:text-primary transition">Valuation</a></li>
-                  <li><a href="/services/insure-car" className="hover:text-primary transition">Insurance</a></li>
+                  <li><a href="/services/insure-car" className="hover:text-primary transition">Insure Your Car</a></li>
                   <li><a href="/services/finance" className="hover:text-primary font-bold text-white transition">Finance Hub</a></li>
                 </ul>
               </div>
