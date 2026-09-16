@@ -37,9 +37,7 @@ export default function RootLayout({
               {/* Added pt-2 to an invisible wrapper so the mouse never leaves the hover area */}
               <div className="absolute left-0 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-300 z-50">
                 <div className="bg-white rounded-md shadow-lg overflow-hidden border border-gray-100">
-                  <a href="/services/finance" className="block px-4 py-3 text-sm font-bold text-gray-900 bg-blue-50 border-b border-gray-100 hover:bg-blue-100 transition">Finance Hub (Apply Now)</a>
-                  <a href="/services/logbook-financing" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">Logbook Financing Info</a>
-                  <a href="/services/import-financing" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">Import Financing Info</a>
+                  <a href="/services/finance" className="block px-4 py-3 text-sm font-bold text-gray-900 bg-blue-50 border-b border-gray-100 hover:bg-blue-100 transition">Finance Hub</a>
                   <a href="/services/insure-car" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">Insure Your Car</a>
                   <a href="/services/value-car" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition">Value Your Car</a>
                 </div>
@@ -67,12 +65,11 @@ export default function RootLayout({
               <div>
                 <h3 className="text-xl font-bold mb-6 text-gray-100">Marketplace</h3>
                 <ul className="space-y-4 text-gray-300">
-                  <li><a href="#" className="hover:text-primary transition">Imports</a></li>
-                  <li><a href="#" className="hover:text-primary transition">Brand New</a></li>
                   <li><a href="/search" className="hover:text-primary transition">Parts & Accessories</a></li>
+                  <li><a href="#" className="hover:text-primary transition">Brand New</a></li>
                   <li><a href="/services/value-car" className="hover:text-primary transition">Valuation</a></li>
                   <li><a href="/services/insure-car" className="hover:text-primary transition">Insurance</a></li>
-                  <li><a href="/services/logbook-financing" className="hover:text-primary transition">Logbook Financing</a></li>
+                  <li><a href="/services/finance" className="hover:text-primary font-bold text-white transition">Finance Hub</a></li>
                 </ul>
               </div>
 
