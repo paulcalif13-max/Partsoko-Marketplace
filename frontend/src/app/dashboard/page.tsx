@@ -35,31 +35,38 @@ export default function Dashboard() {
 
         {role === 'SELLER' && (
           <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Seller Dashboard</h2>
+            <h2 className="text-xl font-semibold mb-4">Seller Control Center</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="/dashboard/inventory" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">Manage Inventory (Add Parts)</a>
-              <a href="/dashboard/orders" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">Incoming Orders</a>
+              <a href="/dashboard/seller" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">Open Seller Hub (Books & Inventory)</a>
             </div>
           </div>
         )}
 
-        {/* Buyer Section is available to ALL users (Sellers and Mechanics can also buy) */}
+        {role === 'MECHANIC' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4">Mechanic Control Center</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="/dashboard/mechanic" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">Open Mechanic Workspace (Books & Jobs)</a>
+            </div>
+          </div>
+        )}
+
+        {role === 'VALUER' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4">Valuer Control Center</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="/dashboard/valuer" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">Open Valuer Command Center</a>
+            </div>
+          </div>
+        )}
+
+        {/* Buyer Section is available to ALL users (Sellers, Mechanics, and Valuers can also buy) */}
         <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
           <h2 className="text-xl font-semibold mb-4">My Shopping Account (Buyer)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a href="/dashboard/purchases" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">My Purchase History & Quotations</a>
           </div>
         </div>
-
-        {role === 'MECHANIC' && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Mechanic Dashboard</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a href="/dashboard/mechanic" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">My Bookings</a>
-              <div className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center text-gray-700">Trade Discount Parts</div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

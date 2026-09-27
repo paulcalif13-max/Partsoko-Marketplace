@@ -59,6 +59,7 @@ export default function Register() {
               <option value="BUYER">I am a Buyer</option>
               <option value="SELLER">I am a Seller</option>
               <option value="MECHANIC">I am a Mechanic</option>
+              <option value="VALUER">I am a Valuer</option>
             </select>
           </div>
 

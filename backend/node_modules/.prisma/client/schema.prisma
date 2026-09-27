@@ -12,6 +12,7 @@ enum Role {
   SELLER
   BUYER
   MECHANIC
+  VALUER
 }
 
 enum OrderStatus {
