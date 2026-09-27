@@ -12,9 +12,24 @@
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
   }
-}
 
-body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  /* Global UI Polish */
+  body {
+    @apply bg-surface text-gray-900 antialiased;
+  }
+  
+  /* Standardize Inputs globally */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    @apply w-full border border-gray-300 rounded-md p-3 text-gray-900 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none transition-colors duration-200;
+  }
+
+  /* Standardize Interactive Buttons */
+  button {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 active:scale-[0.98];
+  }
 }
