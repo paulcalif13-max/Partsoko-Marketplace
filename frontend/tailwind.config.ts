@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#1d4ed8", // Deep Blue
-        secondary: "#9333ea", // Purple
-        accent: "#f59e0b", // Amber for warnings/badges
-        surface: "#f8fafc", // Very light gray for backgrounds
-        brandDark: "#0f172a", // Slate 900 for dark mode/footers
+        primary: "#2563eb", /* Vibrant Blue */
+        secondary: "#1e293b", /* Dark Navy / Slate 800 */
+        brandDark: "#0f172a", /* Almost black for footer/text */
+        brandRed: "#ef4444", /* Red accent for logo and buttons */
+        surface: "#f8fafc", /* Light background */
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
