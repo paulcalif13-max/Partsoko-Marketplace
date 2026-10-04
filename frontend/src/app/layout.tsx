@@ -22,8 +22,6 @@ export default function RootLayout({
         <div className="bg-brandDark text-gray-300 text-xs py-2 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <span className="flex items-center"><svg className="w-4 h-4 mr-1 text-brandRed" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Nairobi, Kenya</span>
-            <span className="hidden sm:inline">|</span>
-            <span className="hidden sm:inline">Free delivery on selected items</span>
           </div>
           <div className="flex items-center space-x-4">
             <a href="#" className="hover:text-white transition">Help & Support</a>
@@ -43,10 +41,9 @@ export default function RootLayout({
           {/* Logo */}
           <a href="/" className="flex items-center flex-shrink-0">
             <div className="flex items-center">
-              <span className="text-brandRed text-4xl font-extrabold italic mr-1">P</span>
-              <div className="flex flex-col">
-                <span className="text-brandDark text-2xl font-extrabold tracking-tighter leading-none">PARTSOKO</span>
-                <span className="text-[9px] font-bold text-gray-500 tracking-widest mt-0.5">AUTO PARTS MARKETPLACE</span>
+              <img src="/partsoko-logo.jpg" alt="PARTSOKO Logo" className="h-12 w-auto mr-2" />
+              <div className="flex flex-col mt-2">
+                <span className="text-[10px] font-bold text-gray-500 tracking-widest leading-none">AUTO PARTS MARKETPLACE</span>
               </div>
             </div>
           </a>
@@ -85,25 +82,17 @@ export default function RootLayout({
 
         {/* Tier 3: Navigation Menu */}
         <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 hidden md:flex items-center shadow-sm relative z-40">
-          <div className="flex items-center py-3 px-4 border-r border-gray-200 cursor-pointer hover:bg-gray-50 transition group">
-            <svg className="w-5 h-5 mr-2 text-gray-600 group-hover:text-primary transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            <span className="font-bold text-sm text-gray-800">All Categories</span>
-            <svg className="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-          </div>
-          
-          <ul className="flex space-x-8 ml-8 text-sm font-medium text-gray-600 h-full items-center">
+          <ul className="flex space-x-10 text-sm font-medium text-gray-700 h-full items-center mx-auto">
             <li><a href="/" className="text-primary border-b-2 border-primary pb-[14px] pt-4 block font-bold">Home</a></li>
-            <li><a href="/search" className="hover:text-primary transition block py-4">Automotive Parts</a></li>
-            <li><a href="/search" className="hover:text-primary transition block py-4">Automotive Electronics</a></li>
-            <li><a href="/services/insure-car" className="hover:text-primary transition block py-4">Insurance</a></li>
-            <li><a href="/services/finance" className="hover:text-primary transition block py-4">Financing</a></li>
-            <li><a href="/services/towing" className="hover:text-primary transition py-4 flex items-center">Towing <span className="ml-1 bg-brandRed text-white text-[9px] px-1.5 py-0.5 rounded-sm shadow-sm">24/7</span></a></li>
+            <li><a href="/search" className="hover:text-primary transition block py-4">Parts</a></li>
+            <li><a href="/mechanics" className="hover:text-primary transition block py-4">Find mechanic</a></li>
             <li className="relative group h-full">
-              <a href="#" className="hover:text-primary transition py-4 flex items-center h-full">More <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></a>
-              <div className="absolute left-0 top-full w-48 bg-white border border-gray-200 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
-                <a href="/services/value-car" className="block px-4 py-3 hover:bg-surface text-sm border-b border-gray-50">Value Your Car</a>
-                <a href="/mechanics" className="block px-4 py-3 hover:bg-surface text-sm border-b border-gray-50">Find a Mechanic</a>
-                <a href="/events" className="block px-4 py-3 hover:bg-surface text-sm">Events</a>
+              <span className="hover:text-primary transition py-4 flex items-center h-full cursor-pointer">Our Services <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
+              <div className="absolute left-0 top-full w-56 bg-white border border-gray-200 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                <a href="/services/towing" className="block px-4 py-3 hover:bg-surface text-sm border-b border-gray-50 flex items-center justify-between">Towing <span className="bg-brandRed text-white text-[9px] px-1.5 py-0.5 rounded-sm">24/7</span></a>
+                <a href="/services/finance" className="block px-4 py-3 hover:bg-surface text-sm border-b border-gray-50">Parts Financing</a>
+                <a href="/services/finance" className="block px-4 py-3 hover:bg-surface text-sm border-b border-gray-50">Repair Financing</a>
+                <a href="/services/value-car" className="block px-4 py-3 hover:bg-surface text-sm">Value your car</a>
               </div>
             </li>
           </ul>
@@ -120,10 +109,9 @@ export default function RootLayout({
               {/* Column 1: Logo & Socials */}
               <div>
                 <a href="/" className="flex items-center mb-6">
-                  <span className="text-brandRed text-4xl font-extrabold italic mr-1">P</span>
-                  <div className="flex flex-col">
-                    <span className="text-white text-2xl font-extrabold tracking-tighter leading-none">PARTSOKO</span>
-                    <span className="text-[9px] font-bold text-gray-400 tracking-widest mt-0.5">AUTO PARTS MARKETPLACE</span>
+                  <img src="/partsoko-logo.jpg" alt="PARTSOKO Logo" className="h-10 w-auto bg-white rounded p-1 mr-2" />
+                  <div className="flex flex-col mt-2">
+                    <span className="text-[9px] font-bold text-gray-400 tracking-widest leading-none">AUTO PARTS MARKETPLACE</span>
                   </div>
                 </a>
                 <div className="flex space-x-4 mb-6">

@@ -25,11 +25,7 @@ export default function Home() {
           </div>
           
           <div className="md:w-1/2 relative h-64 md:h-full min-h-[400px] w-full flex items-center justify-center p-8">
-            {/* We don't have the exact image, so we use a placeholder that matches the aesthetic */}
-            <div className="absolute inset-0 bg-cover bg-center opacity-90" style={{backgroundImage: "url('/logo.jpg')"}}></div>
-            <div className="absolute top-10 right-10 transform rotate-12 bg-white/80 backdrop-blur px-4 py-2 rounded-lg shadow-xl hidden md:block border border-white">
-              <p className="font-['Caveat',cursive] text-2xl font-bold text-brandDark italic tracking-wider">More than just parts.</p>
-            </div>
+            {/* Clean empty right side as requested */}
           </div>
         </div>
       </div>
@@ -44,13 +40,15 @@ export default function Home() {
           <a href="/search" className="text-sm font-bold text-primary hover:underline flex items-center">View All Categories <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg></a>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {[
-            { name: 'Automotive Parts', desc: 'Engine, brake, suspension and more', icon: '🚗' },
-            { name: 'Automotive Electronics', desc: 'ECUs, sensors, lighting and more', icon: '🔋' },
-            { name: 'Electronic Components', desc: 'Resistors, capacitors, ICs and more', icon: '🔌' },
-            { name: 'Maker Products', desc: 'Arduino, Raspberry Pi, sensors and more', icon: '⚙️' },
-            { name: 'Consumer Electronics', desc: 'Phones, laptops, audio, accessories and more', icon: '💻' }
+            { name: 'Engines and Engine Parts', icon: '⚙️' },
+            { name: 'Transmission and Drive Terrain', icon: '🔄' },
+            { name: 'Suspension', icon: '🛞' },
+            { name: 'Electrical and Electronics', icon: '⚡' },
+            { name: 'Lighting', icon: '💡' },
+            { name: 'Fuel Systems', icon: '⛽' },
+            { name: 'Body and Exterior', icon: '🚘' }
           ].map((cat, i) => (
             <a href="/search" key={cat.name} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-hover hover:border-primary transition group relative overflow-hidden flex flex-col">
               <div className="h-24 bg-surface rounded-lg mb-4 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform duration-300 border border-gray-100">
