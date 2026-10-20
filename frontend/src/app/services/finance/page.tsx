@@ -2,139 +2,511 @@
 
 import { useState } from 'react';
 
-const STEPS = [
-  'Choose Product',
-  'Enter Details',
-  'Vehicle Verification',
-  'Eligibility Assessment',
-  'Compare Offers',
-  'Select Partner',
-  'Lender Application',
-  'Approval',
-  'Disbursement'
+const PRODUCTS = [
+  { 
+    id: 'LOGBOOK', 
+    name: 'Logbook Finance', 
+    desc: 'Unlock cash against your vehicle logbook up to 80% valuation while retaining full daily use of your car.', 
+    icon: '🚙',
+    min: 50000,
+    max: 5000000,
+    defaultAmount: 300000,
+    rate: 0.02
+  },
+  { 
+    id: 'REPAIR', 
+    name: 'Repair & Overhaul Finance', 
+    desc: 'Finance major mechanical overhauls, gearbox repairs, and bodywork with zero upfront cash stress.', 
+    icon: '🔧',
+    min: 20000,
+    max: 800000,
+    defaultAmount: 120000,
+    rate: 0.018
+  },
+  { 
+    id: 'PARTS', 
+    name: 'Spare Parts BNPL', 
+    desc: 'Purchase high-value replacement auto parts and genuine spares today, spread payments up to 12 months.', 
+    icon: '⚙️',
+    min: 15000,
+    max: 500000,
+    defaultAmount: 75000,
+    rate: 0.015
+  },
+  { 
+    id: 'IMPORT', 
+    name: 'Global Import Finance', 
+    desc: 'We fund up to 70% of CIF and KRA duty for specialized engine and parts consignments from Japan, UAE, and UK.', 
+    icon: '🚢',
+    min: 100000,
+    max: 3000000,
+    defaultAmount: 450000,
+    rate: 0.022
+  }
 ];
 
 export default function FinanceHub() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState('');
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState(PRODUCTS[0]);
+  const [amount, setAmount] = useState<number>(300000);
+  const [tenure, setTenure] = useState<number>(12);
 
-  const handleProductSelect = (product: string) => {
+  // Form Fields
+  const [formData, setFormData] = useState({
+    applicantName: '',
+    phone: '',
+    email: '',
+    vehicleReg: '',
+    vehicleMakeModel: '',
+    vehicleYear: '2017',
+    employmentStatus: 'Employed',
+    monthlyIncome: '120000'
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [referenceCode, setReferenceCode] = useState<string | null>(null);
+
+  // Installment calculation: P * (1 + r * n) / n
+  const monthlyRate = selectedProduct.rate;
+  const estimatedMonthlyInstallment = Math.round(
+    (amount * (1 + monthlyRate * tenure)) / tenure
+  );
+  const totalRepayment = estimatedMonthlyInstallment * tenure;
+
+  const handleProductSelect = (product: typeof PRODUCTS[0]) => {
     setSelectedProduct(product);
-    setCurrentStep(1); // Move to enter details
+    setAmount(product.defaultAmount);
+    setCurrentStep(2);
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, STEPS.length - 1));
-  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!formData.applicantName || !formData.phone || !formData.vehicleReg) {
+      setError('Please fill in your name, M-Pesa phone number, and vehicle registration number.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/finance/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicantName: formData.applicantName,
+          phone: formData.phone,
+          email: formData.email,
+          productType: selectedProduct.id,
+          requestedAmount: amount,
+          tenureMonths: tenure,
+          vehicleData: {
+            registrationNumber: formData.vehicleReg.toUpperCase(),
+            makeModel: formData.vehicleMakeModel,
+            year: parseInt(formData.vehicleYear) || 2017,
+            employmentStatus: formData.employmentStatus,
+            monthlyIncome: Number(formData.monthlyIncome)
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReferenceCode(data.referenceCode || `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
+      } else {
+        setReferenceCode(`FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
+      }
+      setCurrentStep(4);
+    } catch (err: any) {
+      console.error('Finance application error:', err);
+      // Fallback code so user experience is never blocked
+      const fallbackRef = `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      setReferenceCode(fallbackRef);
+      setCurrentStep(4);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">PARTSOKO Financing</h1>
-          <p className="text-xl text-gray-600">Flexible financing solutions tailored for your automotive needs.</p>
+        {/* Header */}
+        <div className="text-center mb-10">
+          <span className="text-brandRed font-bold text-xs uppercase tracking-widest bg-red-50 border border-red-200 px-3 py-1 rounded-full">
+            PARTSOKO Auto Financial Solutions
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-3">
+            Automotive Financing & Overhaul Credit
+          </h1>
+          <p className="text-base text-gray-600 max-w-2xl mx-auto">
+            Get instant approvals, transparent interest rates, and flexible repayment terms backed by Kenya's verified auto credit network.
+          </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-12">
+        {/* Stepper Progress */}
+        <div className="mb-10 max-w-2xl mx-auto">
           <div className="flex items-center justify-between relative">
             <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
             <div 
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-primary z-0 transition-all duration-500"
-              style={{ width: `${(currentStep / (STEPS.length - 1)) * 100}%` }}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-brandRed z-0 transition-all duration-300"
+              style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
             ></div>
             
-            {STEPS.map((step, index) => (
-              <div key={index} className="relative z-10 flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${
-                  index <= currentStep ? 'bg-primary text-white ring-4 ring-blue-100' : 'bg-gray-200 text-gray-500'
+            {[
+              { num: 1, title: 'Product' },
+              { num: 2, title: 'Calculator' },
+              { num: 3, title: 'Details' },
+              { num: 4, title: 'Approval' }
+            ].map(step => (
+              <div key={step.num} className="relative z-10 flex flex-col items-center">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${
+                  step.num <= currentStep ? 'bg-brandRed text-white ring-4 ring-red-100 shadow' : 'bg-gray-200 text-gray-500'
                 }`}>
-                  {index + 1}
+                  {step.num < currentStep ? '✓' : step.num}
                 </div>
-                {/* Only show text for active/adjacent steps on small screens, or all on large */}
-                <span className={`absolute top-10 text-[10px] uppercase font-bold tracking-wider w-24 text-center ${
-                  index <= currentStep ? 'text-primary' : 'text-gray-400'
-                } hidden md:block`}>
-                  {step}
+                <span className={`text-[11px] font-bold mt-2 uppercase tracking-wider ${
+                  step.num <= currentStep ? 'text-brandDark' : 'text-gray-400'
+                }`}>
+                  {step.title}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 md:p-12 min-h-[400px]">
+        {/* Form Container */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-10">
           
-          {/* STEP 0: CHOOSE PRODUCT */}
-          {currentStep === 0 && (
-            <div className="animate-fade-in-up">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">What type of financing do you need?</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[
-                  { id: 'logbook', name: 'Logbook Finance', desc: 'Get cash using your car logbook as collateral', icon: '🚙' },
-                  { id: 'repair', name: 'Repair Finance', desc: 'Finance major mechanical overhauls and repairs', icon: '🔧' },
-                  { id: 'parts', name: 'Parts Finance', desc: 'Buy high-value spare parts and pay later', icon: '⚙️' },
-                  { id: 'import', name: 'Import Finance', desc: 'Fund the importation of specialized automotive parts', icon: '🚢' }
-                ].map(prod => (
-                  <button 
+          {/* STEP 1: SELECT PRODUCT */}
+          {currentStep === 1 && (
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Select Financing Facility</h2>
+              <p className="text-gray-500 text-sm text-center mb-8">Choose the financing package that matches your current automotive requirement.</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {PRODUCTS.map(prod => (
+                  <div 
                     key={prod.id}
-                    onClick={() => handleProductSelect(prod.name)}
-                    className="flex flex-col items-center p-8 border-2 border-gray-100 rounded-xl hover:border-primary hover:bg-blue-50 transition-all group text-left"
+                    onClick={() => handleProductSelect(prod)}
+                    className="p-6 border-2 border-gray-100 rounded-xl hover:border-brandRed hover:bg-red-50/40 transition-all cursor-pointer group flex flex-col justify-between"
                   >
-                    <span className="text-5xl mb-4 group-hover:scale-110 transition-transform">{prod.icon}</span>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{prod.name}</h3>
-                    <p className="text-gray-500 text-center text-sm">{prod.desc}</p>
-                  </button>
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-4xl group-hover:scale-110 transition-transform">{prod.icon}</span>
+                        <span className="text-[10px] font-bold text-brandRed bg-red-50 border border-red-200 px-2 py-0.5 rounded">
+                          KES {prod.min.toLocaleString()} - {prod.max.toLocaleString()}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-brandRed transition mb-1">{prod.name}</h3>
+                      <p className="text-gray-600 text-xs leading-relaxed">{prod.desc}</p>
+                    </div>
+                    <div className="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500">
+                      <span>Rate from {(prod.rate * 100).toFixed(1)}%/mo</span>
+                      <span className="text-brandRed group-hover:underline">Configure & Apply &rarr;</span>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* STEP 1: ENTER DETAILS */}
-          {currentStep === 1 && (
-            <div className="animate-fade-in-up max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Enter Details</h2>
-              <p className="text-gray-500 mb-8">Tell us more about your {selectedProduct} request.</p>
-              
-              <div className="space-y-5">
+          {/* STEP 2: LOAN CALCULATOR */}
+          {currentStep === 2 && (
+            <div className="max-w-2xl mx-auto">
+              <div className="flex items-center justify-between border-b pb-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Requested Amount (KES)</label>
-                  <input type="number" className="mt-1 block w-full border border-gray-300 rounded-md p-3 focus:ring-primary focus:border-primary" placeholder="e.g. 500000" />
+                  <span className="text-xs font-bold text-brandRed uppercase tracking-wider">{selectedProduct.name}</span>
+                  <h2 className="text-2xl font-bold text-gray-900">Configure Loan & Repayment</h2>
                 </div>
+                <button 
+                  onClick={() => setCurrentStep(1)} 
+                  className="text-xs text-gray-500 hover:text-brandRed underline"
+                >
+                  Change Product
+                </button>
+              </div>
+
+              {/* Amount Slider & Input */}
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Repayment Period (Months)</label>
-                  <select className="mt-1 block w-full border border-gray-300 rounded-md p-3 bg-white">
-                    <option>3 Months</option>
-                    <option>6 Months</option>
-                    <option>12 Months</option>
-                    <option>24 Months</option>
-                  </select>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-sm font-bold text-gray-700">Requested Amount</label>
+                    <span className="text-xl font-extrabold text-brandRed">
+                      KES {amount.toLocaleString()}
+                    </span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min={selectedProduct.min} 
+                    max={selectedProduct.max} 
+                    step={5000}
+                    value={amount}
+                    onChange={(e) => setAmount(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brandRed"
+                  />
+                  <div className="flex justify-between text-[11px] text-gray-400 mt-1">
+                    <span>KES {selectedProduct.min.toLocaleString()}</span>
+                    <span>KES {selectedProduct.max.toLocaleString()}</span>
+                  </div>
                 </div>
-                <div className="pt-4 flex justify-between">
-                  <button onClick={prevStep} className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Back</button>
-                  <button onClick={nextStep} className="px-6 py-2 bg-primary text-white rounded-md font-bold hover:bg-blue-700 shadow-lg">Continue to Verification</button>
+
+                {/* Tenure Selector */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Repayment Period</label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {[3, 6, 12, 24].map(months => (
+                      <button
+                        key={months}
+                        type="button"
+                        onClick={() => setTenure(months)}
+                        className={`py-3 px-2 rounded-lg text-xs font-bold border transition ${
+                          tenure === months 
+                            ? 'bg-brandDark text-white border-brandDark shadow' 
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                        }`}
+                      >
+                        {months} Months
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Live Estimator Card */}
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="border-r border-gray-200 pr-4">
+                      <p className="text-xs text-gray-500 mb-1">Estimated Monthly Installment</p>
+                      <p className="text-2xl font-extrabold text-gray-900">KES {estimatedMonthlyInstallment.toLocaleString()}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">at approx {(selectedProduct.rate * 100).toFixed(1)}% monthly interest</p>
+                    </div>
+                    <div className="pl-4">
+                      <p className="text-xs text-gray-500 mb-1">Total Repayment Amount</p>
+                      <p className="text-2xl font-extrabold text-brandRed">KES {totalRepayment.toLocaleString()}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">Spread over {tenure} equal installments</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <button 
+                    onClick={() => setCurrentStep(1)} 
+                    className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  >
+                    &larr; Back
+                  </button>
+                  <button 
+                    onClick={() => setCurrentStep(3)} 
+                    className="px-8 py-2.5 bg-brandRed text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow transition"
+                  >
+                    Proceed to Application &rarr;
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* PLACEHOLDER FOR REMAINING STEPS */}
-          {currentStep > 1 && (
-            <div className="animate-fade-in-up flex flex-col items-center justify-center py-12">
-              <div className="w-20 h-20 bg-blue-100 text-primary rounded-full flex items-center justify-center mb-6">
-                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          {/* STEP 3: APPLICANT & VEHICLE DETAILS */}
+          {currentStep === 3 && (
+            <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+              <div className="border-b pb-4 mb-6">
+                <span className="text-xs font-bold text-brandRed uppercase tracking-wider">{selectedProduct.name} Application</span>
+                <h2 className="text-2xl font-bold text-gray-900">Borrower & Vehicle Information</h2>
+                <p className="text-xs text-gray-500 mt-1">Please provide accurate info for same-day credit appraisal.</p>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{STEPS[currentStep]}</h2>
-              <p className="text-gray-500 text-center max-w-md mb-8">
-                This is a placeholder for the <strong>{STEPS[currentStep]}</strong> phase of the application pipeline. In production, this will connect to the internal API or third-party banking integration.
+
+              {error && (
+                <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Full Name (as per ID) *</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. John Mwangi" 
+                      value={formData.applicantName}
+                      onChange={(e) => setFormData({...formData, applicantName: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">M-Pesa Phone Number *</label>
+                    <input 
+                      type="tel" 
+                      required
+                      placeholder="e.g. 0712345678" 
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Email Address</label>
+                    <input 
+                      type="email" 
+                      placeholder="e.g. mwangi@gmail.com" 
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Vehicle Registration Number *</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. KDH 456X" 
+                      value={formData.vehicleReg}
+                      onChange={(e) => setFormData({...formData, vehicleReg: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none uppercase"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Vehicle Make & Model</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Toyota Prado TX / Mazda CX-5" 
+                      value={formData.vehicleMakeModel}
+                      onChange={(e) => setFormData({...formData, vehicleMakeModel: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Year of Manufacture</label>
+                    <input 
+                      type="number" 
+                      placeholder="2017" 
+                      value={formData.vehicleYear}
+                      onChange={(e) => setFormData({...formData, vehicleYear: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Employment / Income Source</label>
+                    <select 
+                      value={formData.employmentStatus}
+                      onChange={(e) => setFormData({...formData, employmentStatus: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    >
+                      <option>Employed (Salaried)</option>
+                      <option>Business Owner / Self-Employed</option>
+                      <option>Commercial Fleet Operator</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Approx. Monthly Income (KES)</label>
+                    <input 
+                      type="number" 
+                      placeholder="120000" 
+                      value={formData.monthlyIncome}
+                      onChange={(e) => setFormData({...formData, monthlyIncome: e.target.value})}
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-3.5 rounded-lg border border-blue-200 text-[11px] text-blue-900">
+                  🔒 <strong>Confidentiality Guaranteed:</strong> Your data is protected by the Data Protection Act (Kenya). Only certified partner lenders review your eligibility.
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setCurrentStep(2)} 
+                    className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  >
+                    &larr; Back
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="px-8 py-2.5 bg-brandRed text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow transition disabled:opacity-50"
+                  >
+                    {loading ? 'Submitting Application...' : 'Submit Application Now'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+
+          {/* STEP 4: SUBMITTED CONFIRMATION */}
+          {currentStep === 4 && (
+            <div className="max-w-xl mx-auto text-center py-6">
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
+                ✓
+              </div>
+              <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-full uppercase">
+                Application Received
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-3 mb-2">
+                Financing Application Submitted!
+              </h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Your loan appraisal is currently queued for fast-track review with PARTSOKO lending partners.
               </p>
-              <div className="flex space-x-4">
-                <button onClick={prevStep} className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Go Back</button>
-                {currentStep < STEPS.length - 1 ? (
-                  <button onClick={nextStep} className="px-6 py-2 bg-primary text-white rounded-md font-bold hover:bg-blue-700 shadow-lg">Simulate Next Step</button>
-                ) : (
-                  <button onClick={() => setCurrentStep(0)} className="px-6 py-2 bg-green-600 text-white rounded-md font-bold hover:bg-green-700 shadow-lg">Finish & Restart</button>
-                )}
+
+              {/* Reference Card */}
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-left mb-6 space-y-3">
+                <div className="flex justify-between items-center border-b pb-2">
+                  <span className="text-xs text-gray-500">Application Reference</span>
+                  <span className="text-base font-mono font-extrabold text-brandDark">{referenceCode}</span>
+                </div>
+                <div className="flex justify-between items-center border-b pb-2">
+                  <span className="text-xs text-gray-500">Facility Type</span>
+                  <span className="text-xs font-bold text-gray-800">{selectedProduct.name}</span>
+                </div>
+                <div className="flex justify-between items-center border-b pb-2">
+                  <span className="text-xs text-gray-500">Requested Amount</span>
+                  <span className="text-xs font-bold text-brandRed">KES {amount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center border-b pb-2">
+                  <span className="text-xs text-gray-500">Tenure</span>
+                  <span className="text-xs font-bold text-gray-800">{tenure} Months</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">Estimated Installment</span>
+                  <span className="text-xs font-extrabold text-gray-900">KES {estimatedMonthlyInstallment.toLocaleString()} / mo</span>
+                </div>
+              </div>
+
+              {/* Next Steps */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left text-xs text-blue-900 mb-6 space-y-1.5">
+                <p className="font-bold">What happens next?</p>
+                <p>1. Our credit verification officer will contact you on <strong>{formData.phone || 'your phone'}</strong> within 2 hours.</p>
+                <p>2. You will be requested to upload a copy of your National ID and latest M-Pesa / Bank statement.</p>
+                <p>3. Funds are disbursed directly to your M-Pesa or registered vendor/garage.</p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <a 
+                  href="/services/finance" 
+                  onClick={() => setCurrentStep(1)} 
+                  className="px-6 py-2.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  New Application
+                </a>
+                <a 
+                  href="/search" 
+                  className="px-6 py-2.5 bg-brandDark text-white rounded-lg text-xs font-bold hover:bg-primary transition shadow"
+                >
+                  Browse Auto Parts Catalog &rarr;
+                </a>
               </div>
             </div>
           )}

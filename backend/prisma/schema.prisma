@@ -23,6 +23,18 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum Category {
+  ENGINE
+  TRANSMISSION
+  SUSPENSION
+  ELECTRICAL
+  LIGHTING
+  FUEL
+  BODY
+  ACCESSORIES
+  OTHER
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -44,19 +56,33 @@ model User {
   // Mechanic specific
   bookings  Booking[] @relation("MechanicBookings")
   bookedBy  Booking[] @relation("UserBookings")
+
+  // Services relations
+  importRequests      ImportRequest[]
+  towingRequests      TowingRequest[]
+  valuationRequests   ValuationRequest[]   @relation("UserValuations")
+  assignedValuations  ValuationRequest[]   @relation("ValuerJobs")
+  financeApplications FinanceApplication[]
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  stock       Int
-  sellerId    String
-  seller      User     @relation(fields: [sellerId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  orderItems  OrderItem[]
+  id            String      @id @default(uuid())
+  name          String
+  description   String
+  price         Float
+  stock         Int
+  category      Category    @default(OTHER)
+  partNumber    String?
+  brand         String?
+  condition     String      @default("NEW") // NEW, REFURBISHED, USED
+  images        String[]    @default([])
+  compatibility Json?       // e.g. { make: "Toyota", model: "Prado", yearFrom: 2015, yearTo: 2022 }
+  featured      Boolean     @default(false)
+  sellerId      String
+  seller        User        @relation(fields: [sellerId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderItems    OrderItem[]
 }
 
 model Order {
@@ -69,6 +95,9 @@ model Order {
   importFee     Float       @default(0) // Admin static %
   taxFee        Float       @default(0) // Admin static %
   deliveryFee   Float       @default(0)
+  paymentMethod String      @default("MPESA") // MPESA, CARD, BANK
+  mpesaReceipt  String?
+  deliveryAddress String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   items         OrderItem[]
@@ -91,10 +120,88 @@ model Booking {
   userId      String
   user        User     @relation("UserBookings", fields: [userId], references: [id])
   serviceDate DateTime
-  status      String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED
+  status      String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
   notes       String?
+  vehicleInfo String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ImportRequest {
+  id              String   @id @default(uuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  customerName    String?
+  customerPhone   String?
+  customerEmail   String?
+  url             String
+  vehicleMake     String?
+  vehicleModel    String?
+  vehicleYear     Int?
+  notes           String?
+  status          String   @default("RECEIVED") // RECEIVED, VERIFYING, QUOTED, PAID, ORDERED, SHIPPED, DELIVERED
+  itemPriceEst    Float?
+  shippingEst     Float?
+  dutyEst         Float?
+  serviceFee      Float?
+  totalLandedCost Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model TowingRequest {
+  id             String   @id @default(uuid())
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+  customerName   String
+  customerPhone  String
+  pickupLocation String
+  destination    String
+  vehicleReg     String
+  vehicleModel   String?
+  fare           Float    @default(3500)
+  status         String   @default("PENDING") // PENDING, DISPATCHED, COMPLETED, CANCELLED
+  providerName   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ValuationRequest {
+  id             String   @id @default(uuid())
+  userId         String?
+  user           User?    @relation("UserValuations", fields: [userId], references: [id])
+  customerName   String?
+  customerPhone  String?
+  vehicleReg     String
+  makeModel      String
+  year           Int
+  vin            String?
+  location       String
+  purpose        String   @default("general") // insurance, sale_purchase, financing, general
+  status         String   @default("PENDING") // PENDING, ASSIGNED, COMPLETED
+  valuerId       String?
+  valuer         User?    @relation("ValuerJobs", fields: [valuerId], references: [id])
+  estimatedValue Float?
+  reportUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model FinanceApplication {
+  id              String   @id @default(uuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  applicantName   String
+  phone           String
+  email           String?
+  productType     String   // LOGBOOK, REPAIR, PARTS, IMPORT
+  requestedAmount Float
+  tenureMonths    Int      @default(12)
+  vehicleData     Json?
+  status          String   @default("SUBMITTED") // SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED, DISBURSED
+  partnerNotes    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Settings {

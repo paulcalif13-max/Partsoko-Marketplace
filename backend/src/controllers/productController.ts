@@ -1,32 +1,52 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { Category } from '@prisma/client';
 
-// @desc    Get all products (with optional search query)
+// @desc    Get all products (with optional search, category, seller query)
 // @route   GET /api/products
 // @access  Public
 export const getProducts = async (req: Request, res: Response) => {
   try {
     const keyword = req.query.keyword as string;
-    
-    const query = keyword ? {
-      OR: [
+    const category = req.query.category as string;
+    const sellerId = req.query.sellerId as string;
+
+    const whereClause: any = {};
+
+    if (keyword) {
+      whereClause.OR = [
         { name: { contains: keyword, mode: 'insensitive' as const } },
-        { description: { contains: keyword, mode: 'insensitive' as const } }
-      ]
-    } : {};
+        { description: { contains: keyword, mode: 'insensitive' as const } },
+        { brand: { contains: keyword, mode: 'insensitive' as const } },
+        { partNumber: { contains: keyword, mode: 'insensitive' as const } }
+      ];
+    }
+
+    if (category) {
+      const upperCat = category.toUpperCase();
+      if (Object.values(Category).includes(upperCat as Category)) {
+        whereClause.category = upperCat as Category;
+      }
+    }
+
+    if (sellerId) {
+      whereClause.sellerId = sellerId;
+    }
 
     const products = await prisma.product.findMany({
-      where: query,
+      where: whereClause,
       include: {
         seller: {
-          select: { name: true }
+          select: { name: true, email: true, phone: true }
         }
-      }
+      },
+      orderBy: { createdAt: 'desc' }
     });
 
     res.json(products);
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Server error while fetching products' });
   }
 };
@@ -40,7 +60,7 @@ export const getProductById = async (req: Request, res: Response) => {
       where: { id: req.params.id },
       include: {
         seller: {
-          select: { name: true }
+          select: { name: true, email: true, phone: true }
         }
       }
     });
@@ -60,20 +80,32 @@ export const getProductById = async (req: Request, res: Response) => {
 // @access  Private/Seller
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, description, price, stock } = req.body;
+    const { name, description, price, stock, category, partNumber, brand, condition, images, compatibility } = req.body;
+
+    let validCategory: Category = Category.OTHER;
+    if (category && Object.values(Category).includes(category.toUpperCase() as Category)) {
+      validCategory = category.toUpperCase() as Category;
+    }
 
     const product = await prisma.product.create({
       data: {
         name,
-        description,
+        description: description || '',
         price: Number(price),
-        stock: Number(stock),
+        stock: Number(stock) || 0,
+        category: validCategory,
+        partNumber: partNumber || null,
+        brand: brand || null,
+        condition: condition || 'NEW',
+        images: Array.isArray(images) ? images : [],
+        compatibility: compatibility || null,
         sellerId: req.user.id,
       },
     });
 
     res.status(201).json(product);
   } catch (error) {
+    console.error('Error creating product:', error);
     res.status(500).json({ message: 'Server error while creating product' });
   }
 };
@@ -83,25 +115,34 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 // @access  Private/Seller
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, description, price, stock } = req.body;
-    
-    // Ensure product belongs to seller
-    const existingProduct = await prisma.product.findUnique({ where: { id: req.params.id } });
-    if (!existingProduct || existingProduct.sellerId !== req.user.id) {
-      return res.status(401).json({ message: 'Not authorized to update this product' });
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
     }
 
-    const product = await prisma.product.update({
+    if (product.sellerId !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Not authorized to edit this product' });
+    }
+
+    const { name, description, price, stock, category, partNumber, brand, condition, images } = req.body;
+
+    const updated = await prisma.product.update({
       where: { id: req.params.id },
       data: {
-        name: name || existingProduct.name,
-        description: description || existingProduct.description,
-        price: price ? Number(price) : existingProduct.price,
-        stock: stock !== undefined ? Number(stock) : existingProduct.stock,
-      },
+        name: name ?? product.name,
+        description: description ?? product.description,
+        price: price !== undefined ? Number(price) : product.price,
+        stock: stock !== undefined ? Number(stock) : product.stock,
+        category: category ?? product.category,
+        partNumber: partNumber ?? product.partNumber,
+        brand: brand ?? product.brand,
+        condition: condition ?? product.condition,
+        images: images ?? product.images
+      }
     });
 
-    res.json(product);
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ message: 'Server error while updating product' });
   }
@@ -112,14 +153,18 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
 // @access  Private/Seller
 export const deleteProduct = async (req: AuthRequest, res: Response) => {
   try {
-    const existingProduct = await prisma.product.findUnique({ where: { id: req.params.id } });
-    
-    if (!existingProduct || (existingProduct.sellerId !== req.user.id && req.user.role !== 'ADMIN')) {
-      return res.status(401).json({ message: 'Not authorized to delete this product' });
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (product.sellerId !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Not authorized to delete this product' });
     }
 
     await prisma.product.delete({ where: { id: req.params.id } });
-    res.json({ message: 'Product removed' });
+    res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error while deleting product' });
   }

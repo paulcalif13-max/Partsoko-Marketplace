@@ -1,126 +1,216 @@
 'use client';
 
+import { useState } from 'react';
+
+interface InspectionJob {
+  id: string;
+  vehicleReg: string;
+  makeModel: string;
+  year: number;
+  location: string;
+  purpose: string;
+  customerName: string;
+  customerPhone: string;
+  status: 'PENDING' | 'COMPLETED';
+  estimatedValue?: number;
+}
+
 export default function ValuerDashboard() {
+  const [jobs, setJobs] = useState<InspectionJob[]>([
+    {
+      id: 'VAL-8821',
+      vehicleReg: 'KDA 789B',
+      makeModel: 'Toyota Land Cruiser Prado TX',
+      year: 2018,
+      location: 'Westlands, Muthithi Road, Nairobi',
+      purpose: 'Insurance Policy Binding',
+      customerName: 'George Ndung\'u',
+      customerPhone: '0711445566',
+      status: 'PENDING'
+    },
+    {
+      id: 'VAL-8820',
+      vehicleReg: 'KCB 456C',
+      makeModel: 'Subaru Forester 2.0XT',
+      year: 2015,
+      location: 'Ruaka, Kiambu Road',
+      purpose: 'Sale / Purchase Market Value',
+      customerName: 'Mary Wanjiku',
+      customerPhone: '0722334455',
+      status: 'PENDING'
+    },
+    {
+      id: 'VAL-8815',
+      vehicleReg: 'KCX 101X',
+      makeModel: 'Mercedes Benz C200 W205',
+      year: 2017,
+      location: 'Karen, Nairobi',
+      purpose: 'Logbook Loan Collateral',
+      customerName: 'Davis Kiprono',
+      customerPhone: '0733889900',
+      status: 'COMPLETED',
+      estimatedValue: 3450000
+    }
+  ]);
+
+  const [selectedJob, setSelectedJob] = useState<InspectionJob | null>(null);
+  const [marketValue, setMarketValue] = useState('');
+  const [forcedSaleValue, setForcedSaleValue] = useState('');
+  const [conditionRating, setConditionRating] = useState('Clean / Excellent');
+  const [reportNotes, setReportNotes] = useState('');
+
+  const handleCompleteReport = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedJob) return;
+
+    setJobs(jobs.map(j => j.id === selectedJob.id ? {
+      ...j,
+      status: 'COMPLETED',
+      estimatedValue: Number(marketValue)
+    } : j));
+
+    setSelectedJob(null);
+    setMarketValue('');
+    setForcedSaleValue('');
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto min-h-[80vh]">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900">Valuer Command Center</h1>
-        <div className="flex space-x-3">
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold text-sm flex items-center">
-            <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span> Active
+    <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-[80vh] bg-surface">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <span className="text-[10px] bg-brandDark text-white font-extrabold px-3 py-1 rounded-sm uppercase tracking-wider mb-2 inline-block">
+            Certified Valuer Workspace
           </span>
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold text-sm">
-            ⭐ 4.9 (42 Reviews)
-          </span>
+          <h1 className="text-3xl font-extrabold text-brandDark">Vehicle Inspection & Valuation</h1>
+          <p className="text-xs text-gray-500">Conduct physical inspections, verify chassis numbers, and issue certified valuation reports.</p>
+        </div>
+        <span className="bg-blue-100 text-primary px-3.5 py-1.5 rounded-full font-bold text-xs">
+          ⭐ Verified Valuer (Licensed by AKI / NTSA)
+        </span>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-xs text-gray-500 font-semibold">Pending Inspections</p>
+          <p className="text-2xl font-black text-yellow-600 mt-1">{jobs.filter(j => j.status === 'PENDING').length}</p>
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-xs text-gray-500 font-semibold">Completed Reports</p>
+          <p className="text-2xl font-black text-green-600 mt-1">{jobs.filter(j => j.status === 'COMPLETED').length + 48}</p>
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-xs text-gray-500 font-semibold">Valuation Revenue</p>
+          <p className="text-2xl font-black text-brandDark mt-1">KES 175,000</p>
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-xs text-gray-500 font-semibold">Average Turnaround</p>
+          <p className="text-2xl font-black text-primary mt-1">4.2 Hours</p>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 font-semibold">Pending Requests</p>
-          <p className="text-3xl font-bold text-yellow-600 mt-2">12</p>
+      {/* Job List */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+          <h2 className="text-base font-bold text-brandDark">Assigned Vehicle Inspections</h2>
+          <span className="text-xs text-gray-400">NTSA / Bank Recognized</span>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 font-semibold">Completed Valuations</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">143</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 font-semibold">This Month's Earnings</p>
-          <p className="text-3xl font-bold text-green-600 mt-2">KES 84,500</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 font-semibold">Average Turnaround</p>
-          <p className="text-3xl font-bold text-blue-600 mt-2">4 Hrs</p>
+
+        <div className="divide-y divide-gray-100">
+          {jobs.map((job) => (
+            <div key={job.id} className="p-6 hover:bg-gray-50/50 transition flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono text-xs font-bold text-gray-400">{job.id}</span>
+                  <span className="font-black text-base text-brandDark">{job.vehicleReg}</span>
+                  <span className="text-xs font-semibold text-gray-600">• {job.makeModel} ({job.year})</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1 space-x-3">
+                  <span>📍 {job.location}</span>
+                  <span>🎯 {job.purpose}</span>
+                  <span>👤 {job.customerName} ({job.customerPhone})</span>
+                </div>
+                {job.estimatedValue && (
+                  <p className="text-xs font-bold text-green-600 mt-2">
+                    Official Valuation: KES {job.estimatedValue.toLocaleString()}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${
+                  job.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {job.status}
+                </span>
+
+                {job.status === 'PENDING' ? (
+                  <button
+                    onClick={() => setSelectedJob(job)}
+                    className="bg-brandDark text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary transition shadow-sm"
+                  >
+                    Conduct Valuation
+                  </button>
+                ) : (
+                  <button className="border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition">
+                    Download PDF Certificate
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Job Queue */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">Valuation Queue (Books & Jobs)</h2>
-              <button className="text-sm font-medium text-primary hover:underline">View All History</button>
+      {/* Valuation Modal */}
+      {selectedJob && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in-up">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden">
+            <div className="bg-brandDark px-6 py-4 flex justify-between items-center text-white">
+              <div>
+                <h3 className="font-extrabold text-base">Complete Vehicle Valuation</h3>
+                <p className="text-xs text-gray-300">{selectedJob.vehicleReg} • {selectedJob.makeModel}</p>
+              </div>
+              <button onClick={() => setSelectedJob(null)} className="text-gray-400 hover:text-white">✕</button>
             </div>
-            
-            <div className="divide-y divide-gray-100">
-              {/* Job Item */}
-              <div className="p-6 hover:bg-blue-50 transition">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">2018 Toyota Prado TX</h3>
-                    <p className="text-sm text-gray-500">Reg: KDA 456X • Chassis: JTEBX99...</p>
-                  </div>
-                  <span className="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">URGENT</span>
+
+            <form onSubmit={handleCompleteReport} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Market Value (KES) *</label>
+                  <input required type="number" value={marketValue} onChange={e => setMarketValue(e.target.value)} placeholder="3800000" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
                 </div>
-                <div className="flex justify-between items-end mt-4">
-                  <div className="text-sm">
-                    <p className="text-gray-700"><strong>Location:</strong> Nairobi, Westlands</p>
-                    <p className="text-gray-700"><strong>Purpose:</strong> Insurance Renewal</p>
-                  </div>
-                  <div className="space-x-3">
-                    <button className="px-4 py-2 border border-gray-300 rounded font-medium text-gray-700 hover:bg-gray-50">Reject</button>
-                    <button className="px-4 py-2 bg-primary text-white rounded font-bold hover:bg-blue-700 shadow-sm">Accept Job</button>
-                  </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Forced Sale Value (KES) *</label>
+                  <input required type="number" value={forcedSaleValue} onChange={e => setForcedSaleValue(e.target.value)} placeholder="2900000" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
                 </div>
               </div>
 
-              {/* Job Item */}
-              <div className="p-6 hover:bg-blue-50 transition">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">2015 Mazda Demio</h3>
-                    <p className="text-sm text-gray-500">Reg: KCE 123Y • Chassis: DEJFS...</p>
-                  </div>
-                  <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">STANDARD</span>
-                </div>
-                <div className="flex justify-between items-end mt-4">
-                  <div className="text-sm">
-                    <p className="text-gray-700"><strong>Location:</strong> Thika Road</p>
-                    <p className="text-gray-700"><strong>Purpose:</strong> Sale/Purchase</p>
-                  </div>
-                  <div className="space-x-3">
-                    <button className="px-4 py-2 border border-gray-300 rounded font-medium text-gray-700 hover:bg-gray-50">Reject</button>
-                    <button className="px-4 py-2 bg-primary text-white rounded font-bold hover:bg-blue-700 shadow-sm">Accept Job</button>
-                  </div>
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Overall Mechanical & Body Condition *</label>
+                <select value={conditionRating} onChange={e => setConditionRating(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                  <option value="Clean / Excellent">Clean / Excellent (No defect noted)</option>
+                  <option value="Good / Normal Wear">Good / Normal Wear & Tear</option>
+                  <option value="Fair / Minor Body Scratches">Fair / Minor Body Scratches</option>
+                  <option value="Poor / Requires Mechanical Repairs">Poor / Requires Mechanical Repairs</option>
+                </select>
               </div>
-            </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Valuer Observations & Recommendation</label>
+                <textarea rows={3} value={reportNotes} onChange={e => setReportNotes(e.target.value)} placeholder="Tyre tread depth ~70%, original engine block confirmed, zero chassis realignment marks..." className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm"></textarea>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-brandRed text-white py-3 rounded-xl font-bold text-sm hover:bg-red-700 transition shadow-soft"
+              >
+                Sign & Issue Official Valuation Certificate
+              </button>
+            </form>
           </div>
         </div>
-
-        {/* Sidebar Tools */}
-        <div className="space-y-6">
-          <div className="bg-gray-900 rounded-xl shadow-sm border border-gray-800 p-6 text-white">
-            <h3 className="font-bold text-lg mb-2 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-              Submit Report
-            </h3>
-            <p className="text-sm text-gray-400 mb-4">Completed an inspection? Upload your official valuation certificate directly to the client's file.</p>
-            <button className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-2 rounded transition">Upload Certificate</button>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="font-bold text-lg text-gray-900 mb-4">My Schedule</h3>
-            <div className="space-y-3">
-              <div className="flex items-center text-sm border-l-2 border-primary pl-3 py-1">
-                <span className="font-bold text-gray-900 w-16">10:00</span>
-                <span className="text-gray-600">Subaru Outback (Kilimani)</span>
-              </div>
-              <div className="flex items-center text-sm border-l-2 border-primary pl-3 py-1">
-                <span className="font-bold text-gray-900 w-16">14:30</span>
-                <span className="text-gray-600">Honda Fit (CBD)</span>
-              </div>
-              <div className="flex items-center text-sm border-l-2 border-gray-300 pl-3 py-1 opacity-50">
-                <span className="font-bold text-gray-900 w-16">16:00</span>
-                <span className="text-gray-600">Available</span>
-              </div>
-            </div>
-            <button className="w-full mt-4 border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold py-2 rounded transition text-sm">Manage Calendar</button>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

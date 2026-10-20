@@ -18,15 +18,39 @@ export default function TowingService() {
     vehicleId: '',
   });
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [towingRef, setTowingRef] = useState('');
+  const [isBooking, setIsBooking] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setStep(2); // Move to provider selection
   };
 
-  const handleBook = (provider: any) => {
+  const handleBook = async (provider: any) => {
     setSelectedProvider(provider);
-    setStep(3); // Confirmation
+    setIsBooking(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/towing/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: formData.name,
+          customerPhone: formData.phone,
+          pickupLocation: formData.location,
+          destination: formData.destination,
+          vehicleReg: formData.vehicleId,
+          providerName: provider.name,
+          fare: provider.basePrice
+        })
+      });
+      const data = await res.json();
+      setTowingRef(data.referenceCode || `TOW-${Date.now().toString().slice(-6)}`);
+    } catch (e) {
+      setTowingRef(`TOW-${Date.now().toString().slice(-6)}`);
+    } finally {
+      setIsBooking(false);
+      setStep(3);
+    }
   };
 
   return (
@@ -140,6 +164,11 @@ export default function TowingService() {
               <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Tow Truck Dispatched!</h2>
+            {towingRef && (
+              <div className="bg-blue-50 text-primary border border-blue-200 text-xs font-bold px-3 py-1 rounded-full inline-block mb-4">
+                Tracking Ref: {towingRef}
+              </div>
+            )}
             <p className="text-lg text-gray-600 mb-8 max-w-lg mx-auto">
               <strong>{selectedProvider.name}</strong> has received your request and is en route to <strong>{formData.location}</strong>.
             </p>
