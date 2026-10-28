@@ -8,8 +8,55 @@ import { CartProvider } from '../context/CartContext';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PARTSOKO - Automotive Spare Parts Marketplace",
-  description: "Your one-stop shop for automotive spare parts and electronics.",
+  metadataBase: new URL("https://www.partsoko.co.ke"),
+  title: {
+    default: "PARTSOKO - Kenya's Automotive Spare Parts & Services Marketplace",
+    template: "%s | PARTSOKO Kenya",
+  },
+  description: "Kenya's trusted online automotive spare parts marketplace. Find genuine OEM parts, verified mechanics in Nairobi, 24/7 roadside towing, auto financing, and global part imports.",
+  keywords: [
+    "Partsoko",
+    "Partsoko Kenya",
+    "car parts Nairobi",
+    "auto spare parts Kenya",
+    "genuine Toyota spare parts",
+    "verified mechanics Ruaka",
+    "roadside towing Nairobi",
+    "auto parts financing Kenya",
+    "Lipa na M-Pesa car parts",
+    "car valuation Kenya",
+    "import auto parts Kenya"
+  ],
+  authors: [{ name: "PARTSOKO" }],
+  creator: "PARTSOKO",
+  publisher: "PARTSOKO",
+  alternates: {
+    canonical: "https://www.partsoko.co.ke",
+  },
+  openGraph: {
+    title: "PARTSOKO - Automotive Spare Parts & Services Marketplace",
+    description: "Find genuine OEM spare parts, verified mechanics, 24/7 towing, and auto financing across Kenya.",
+    url: "https://www.partsoko.co.ke",
+    siteName: "PARTSOKO",
+    locale: "en_KE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PARTSOKO - Automotive Spare Parts Marketplace",
+    description: "Quality auto spare parts, verified mechanics, and 24/7 emergency rescue across Kenya.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
