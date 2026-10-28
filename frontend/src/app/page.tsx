@@ -9,34 +9,41 @@ export default function Home() {
   return (
     <div className="bg-surface pb-12">
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-3 sm:mt-6">
         <div 
           className="bg-brandDark rounded-2xl overflow-hidden shadow-soft flex flex-col md:flex-row items-center relative animate-fade-in-up bg-cover bg-center"
           style={{ backgroundImage: "url('/defender-bg.jpg')", backgroundBlendMode: 'overlay', backgroundColor: 'rgba(30, 41, 59, 0.8)' }}
         >
           
-          <div className="w-full p-12 lg:p-16 relative z-10 flex flex-col md:flex-row items-center justify-between">
-            <div className="md:w-1/2">
-              <span className="bg-brandRed text-white text-xs font-bold px-3 py-1 rounded-sm uppercase tracking-widest mb-6 inline-block">
+          <div className="w-full p-6 sm:p-8 md:p-12 lg:p-16 relative z-10 flex flex-col md:flex-row items-center justify-between">
+            <div className="w-full md:w-1/2">
+              <span className="bg-brandRed text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded mb-3 sm:mb-5 inline-block uppercase tracking-wider">
                 PARTSOKO AUTO PARTS MARKETPLACE
               </span>
-              <h1 className="text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-3 sm:mb-6">
                 Quality Parts.<br/>
                 Better <span className="text-brandRed">Journeys.</span>
               </h1>
-              <p className="text-gray-300 mb-8 max-w-md text-lg">
+              <p className="text-gray-300 mb-6 sm:mb-8 max-w-md text-sm sm:text-base md:text-lg leading-relaxed">
                 Genuine spare parts, automotive electronics, automotive components, and more — all in one place.
               </p>
-              <div className="flex space-x-4">
-                <a href="/search" className="bg-brandRed text-white px-6 py-3 rounded-full font-bold shadow-soft hover:shadow-hover hover:bg-red-700 transition flex items-center">
+              <div className="flex flex-wrap sm:flex-nowrap gap-3 sm:space-x-4">
+                <a href="/search" className="bg-brandRed text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-bold shadow-soft hover:shadow-hover hover:bg-red-700 transition flex items-center justify-center text-xs sm:text-sm">
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                   Shop Now 
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
-                <a href="/services/finance" className="border border-white text-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-brandDark transition flex items-center">
+                <a href="/services/finance" className="border border-white/80 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-bold hover:bg-white hover:text-brandDark transition flex items-center justify-center text-xs sm:text-sm">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                   Get a Quote
                 </a>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 sm:mt-6 text-[11px] sm:text-xs text-gray-300 font-medium">
+                <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> Genuine Parts</span>
+                <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> Verified Mechanics</span>
+                <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> Lipa na M-Pesa</span>
               </div>
             </div>
             
