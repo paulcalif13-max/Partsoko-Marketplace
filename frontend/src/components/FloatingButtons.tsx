@@ -19,7 +19,7 @@ export default function FloatingButtons() {
     setSubmitStatus('idle');
 
     try {
-      const response = await fetch('http://localhost:5000/api/bugs/report', {
+      const response = await fetch('/api/bugs/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
