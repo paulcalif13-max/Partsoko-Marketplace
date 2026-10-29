@@ -27,7 +27,7 @@ export default function InventoryManagement() {
     try {
       // In a real app, you'd filter products by this seller's ID.
       // For now, we just fetch all to demonstrate.
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch('/api/products');
       const data = await res.json();
       if (res.ok) {
         setProducts(data);
@@ -41,7 +41,7 @@ export default function InventoryManagement() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/products', {
+      const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

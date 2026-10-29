@@ -30,7 +30,7 @@ export default function TowingService() {
     setSelectedProvider(provider);
     setIsBooking(true);
     try {
-      const res = await fetch('http://localhost:5000/api/towing/request', {
+      const res = await fetch('/api/towing/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

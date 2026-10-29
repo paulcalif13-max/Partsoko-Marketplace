@@ -53,7 +53,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${params.id}`);
+        const res = await fetch(`/api/products/${params.id}`);
         if (res.ok) {
           const data = await res.json();
           if (data) {

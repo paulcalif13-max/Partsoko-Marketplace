@@ -52,7 +52,7 @@ export default function SellerDashboard() {
       const user = localStorage.getItem('user');
       const token = user ? JSON.parse(user).token : '';
       if (token) {
-        await fetch('http://localhost:5000/api/products', {
+        await fetch('/api/products', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

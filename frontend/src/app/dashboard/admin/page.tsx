@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Load current settings from backend
-    fetch('http://localhost:5000/api/admin/settings')
+    fetch('/api/admin/settings')
       .then(res => res.json())
       .then(data => {
         if (data.commissionPercent) setCommission(data.commissionPercent);
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
     try {
       const user = localStorage.getItem('user');
       const token = user ? JSON.parse(user).token : '';
-      await fetch('http://localhost:5000/api/admin/settings', {
+      await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

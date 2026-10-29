@@ -22,7 +22,7 @@ export default function CheckoutPage() {
 
     try {
       // Create Order on backend or simulate M-Pesa prompt
-      const res = await fetch('http://localhost:5000/api/payments/mpesa/stkpush', {
+      const res = await fetch('/api/payments/mpesa/stkpush', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

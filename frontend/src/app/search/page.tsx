@@ -42,7 +42,7 @@ export default function SearchPage() {
   const fetchProducts = async (searchKeyword = '', catFilter = '') => {
     setLoading(true);
     try {
-      let url = 'http://localhost:5000/api/products?';
+      let url = '/api/products?';
       if (searchKeyword) url += `keyword=${searchKeyword}&`;
       if (catFilter && catFilter !== 'ALL') url += `category=${catFilter}&`;
 

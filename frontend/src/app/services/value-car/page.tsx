@@ -21,7 +21,7 @@ export default function ValueCar() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/valuations', {
+      const res = await fetch('/api/valuations/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

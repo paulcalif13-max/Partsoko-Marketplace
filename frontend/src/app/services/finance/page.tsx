@@ -66,6 +66,8 @@ export default function FinanceHub() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [referenceCode, setReferenceCode] = useState<string | null>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Installment calculation: P * (1 + r * n) / n
   const monthlyRate = selectedProduct.rate;
@@ -90,39 +92,64 @@ export default function FinanceHub() {
     }
 
     setLoading(true);
+
+    const payload = {
+      applicantName: formData.applicantName,
+      phone: formData.phone,
+      email: formData.email,
+      productType: selectedProduct.id,
+      requestedAmount: amount,
+      tenureMonths: tenure,
+      vehicleData: {
+        registrationNumber: formData.vehicleReg.toUpperCase(),
+        makeModel: formData.vehicleMakeModel,
+        year: parseInt(formData.vehicleYear) || 2017,
+        employmentStatus: formData.employmentStatus,
+        monthlyIncome: Number(formData.monthlyIncome)
+      }
+    };
+
     try {
-      const response = await fetch('http://localhost:5000/api/finance/apply', {
+      const response = await fetch('/api/finance/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          applicantName: formData.applicantName,
-          phone: formData.phone,
-          email: formData.email,
-          productType: selectedProduct.id,
-          requestedAmount: amount,
-          tenureMonths: tenure,
-          vehicleData: {
-            registrationNumber: formData.vehicleReg.toUpperCase(),
-            makeModel: formData.vehicleMakeModel,
-            year: parseInt(formData.vehicleYear) || 2017,
-            employmentStatus: formData.employmentStatus,
-            monthlyIncome: Number(formData.monthlyIncome)
-          }
-        })
+        body: JSON.stringify(payload)
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setReferenceCode(data.referenceCode || `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
+      const data = await response.json();
+      const code = data.referenceCode || `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      setReferenceCode(code);
+
+      if (data.whatsappUrl) {
+        setWhatsappUrl(data.whatsappUrl);
       } else {
-        setReferenceCode(`FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
+        const fallbackMsg = encodeURIComponent(
+          `Habari PARTSOKO, I have submitted a Financing Application.\n\n` +
+          `*Reference Code:* ${code}\n` +
+          `*Applicant:* ${formData.applicantName}\n` +
+          `*Phone:* ${formData.phone}\n` +
+          `*Amount:* KES ${amount.toLocaleString()}\n` +
+          `*Vehicle:* ${formData.vehicleReg.toUpperCase()}\n\n` +
+          `Please verify and guide on the next steps.`
+        );
+        setWhatsappUrl(`https://wa.me/254702420404?text=${fallbackMsg}`);
       }
+
       setCurrentStep(4);
     } catch (err: any) {
       console.error('Finance application error:', err);
-      // Fallback code so user experience is never blocked
-      const fallbackRef = `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-      setReferenceCode(fallbackRef);
+      const fallbackCode = `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      setReferenceCode(fallbackCode);
+      const fallbackMsg = encodeURIComponent(
+        `Habari PARTSOKO, I have submitted a Financing Application.\n\n` +
+        `*Reference Code:* ${fallbackCode}\n` +
+        `*Applicant:* ${formData.applicantName}\n` +
+        `*Phone:* ${formData.phone}\n` +
+        `*Amount:* KES ${amount.toLocaleString()}\n` +
+        `*Vehicle:* ${formData.vehicleReg.toUpperCase()}\n\n` +
+        `Please verify and guide on the next steps.`
+      );
+      setWhatsappUrl(`https://wa.me/254702420404?text=${fallbackMsg}`);
       setCurrentStep(4);
     } finally {
       setLoading(false);
@@ -463,9 +490,27 @@ export default function FinanceHub() {
 
               {/* Reference Card */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-left mb-6 space-y-3">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span className="text-xs text-gray-500">Application Reference</span>
-                  <span className="text-base font-mono font-extrabold text-brandDark">{referenceCode}</span>
+                <div className="flex justify-between items-center border-b pb-3">
+                  <div>
+                    <span className="text-xs text-gray-500 block">Your Application Reference Code</span>
+                    <span className="text-xs text-gray-400">Save this code to track your status</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg font-mono font-extrabold text-brandRed tracking-wide">{referenceCode}</span>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        if (referenceCode) {
+                          navigator.clipboard.writeText(referenceCode);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }
+                      }}
+                      className="text-[11px] bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 px-2.5 py-1 rounded font-bold transition shadow-xs"
+                    >
+                      {copied ? 'Copied! ✓' : 'Copy'}
+                    </button>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center border-b pb-2">
                   <span className="text-xs text-gray-500">Facility Type</span>
@@ -485,11 +530,29 @@ export default function FinanceHub() {
                 </div>
               </div>
 
+              {/* Instant WhatsApp Verification Button */}
+              <div className="my-6">
+                <a
+                  href={whatsappUrl || `https://wa.me/254702420404?text=Habari%20PARTSOKO,%20my%20financing%20reference%20code%20is%20${referenceCode}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full bg-[#25D366] hover:bg-green-600 text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-md flex items-center justify-center space-x-2 transition transform active:scale-[0.99]"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  </svg>
+                  <span>Verify on WhatsApp (+254 702 420 404) &rarr;</span>
+                </a>
+                <p className="text-[11px] text-gray-500 mt-2">
+                  Tap above to instantly send your application code to the credit desk for rapid appraisal.
+                </p>
+              </div>
+
               {/* Next Steps */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left text-xs text-blue-900 mb-6 space-y-1.5">
                 <p className="font-bold">What happens next?</p>
-                <p>1. Our credit verification officer will contact you on <strong>{formData.phone || 'your phone'}</strong> within 2 hours.</p>
-                <p>2. You will be requested to upload a copy of your National ID and latest M-Pesa / Bank statement.</p>
+                <p>1. Our credit verification officer will contact you on <strong>{formData.phone || 'your phone'}</strong>.</p>
+                <p>2. You will provide a copy of your National ID and latest M-Pesa / Bank statement.</p>
                 <p>3. Funds are disbursed directly to your M-Pesa or registered vendor/garage.</p>
               </div>
 

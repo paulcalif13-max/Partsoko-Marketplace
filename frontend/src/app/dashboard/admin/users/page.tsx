@@ -18,7 +18,7 @@ export default function UserManagement() {
 
   const fetchUsers = async (authToken: string) => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/users', {
+      const res = await fetch('/api/admin/users', {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       const data = await res.json();
@@ -32,7 +32,7 @@ export default function UserManagement() {
 
   const handleUpdateStatus = async (userId: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/users/${userId}/status`, {
+      const res = await fetch(`/api/admin/users/${userId}/status`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

@@ -16,7 +16,7 @@ export default function PurchaseHistory() {
 
   const fetchMyOrders = async (token: string) => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders/myorders', {
+      const res = await fetch('/api/orders/myorders', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
