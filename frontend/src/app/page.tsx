@@ -17,18 +17,18 @@ export default function Home() {
           
           <div className="w-full p-6 sm:p-8 md:p-12 lg:p-16 relative z-10 flex flex-col md:flex-row items-center justify-between">
             <div className="w-full md:w-1/2">
-              <span className="bg-brandRed text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded mb-3 sm:mb-5 inline-block uppercase tracking-wider">
-                PARTSOKO AUTO PARTS MARKETPLACE
+              <span className="bg-calreeGreen text-slate-950 text-[10px] sm:text-xs font-black px-2.5 py-1 rounded mb-3 sm:mb-5 inline-block uppercase tracking-wider">
+                CALREE AUTOMOTIVE MARKETPLACE
               </span>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-3 sm:mb-6">
-                Quality Parts.<br/>
-                Better <span className="text-brandRed">Journeys.</span>
+                Better parts.<br/>
+                Smoother <span className="text-calreeGreen">journeys.</span>
               </h1>
               <p className="text-gray-300 mb-6 sm:mb-8 max-w-md text-sm sm:text-base md:text-lg leading-relaxed">
                 Genuine spare parts, automotive electronics, automotive components, and more — all in one place.
               </p>
               <div className="flex flex-wrap sm:flex-nowrap gap-3 sm:space-x-4">
-                <a href="/search" className="bg-brandRed text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-bold shadow-soft hover:shadow-hover hover:bg-red-700 transition flex items-center justify-center text-xs sm:text-sm">
+                <a href="/search" className="bg-calreeGreen text-slate-950 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-black shadow-soft hover:shadow-hover hover:bg-emerald-400 transition flex items-center justify-center text-xs sm:text-sm">
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                   Shop Now 
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -74,16 +74,16 @@ export default function Home() {
             { name: 'Fuel System', image: '/categories/fuel.png' },
             { name: 'Body and Exterior', image: '/categories/body.png' }
           ].map((cat, i) => (
-            <a href="/search" key={cat.name} className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 hover:shadow-hover hover:border-brandRed transition group relative overflow-hidden flex flex-col">
+            <a href="/search" key={cat.name} className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 hover:shadow-hover hover:border-calreeGreen transition group relative overflow-hidden flex flex-col">
               <div className="h-28 mb-3 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden rounded-lg bg-gray-50/50">
                 <img src={cat.image} alt={cat.name} className="w-full h-full object-contain p-1" />
               </div>
-              <div className="absolute top-24 left-3 w-7 h-7 bg-brandRed text-white rounded-full flex items-center justify-center shadow-md border-2 border-white z-10">
+              <div className="absolute top-24 left-3 w-7 h-7 bg-calreeGreen text-slate-950 rounded-full flex items-center justify-center shadow-md border-2 border-white z-10">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
               </div>
               <h3 className="font-bold text-xs text-brandDark mt-1 leading-tight flex-grow">{cat.name}</h3>
               <div className="mt-auto pt-2 text-right">
-                <svg className="w-4 h-4 text-brandDark inline-block group-hover:text-brandRed transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                <svg className="w-4 h-4 text-brandDark inline-block group-hover:text-calreeGreen transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
               </div>
             </a>
           ))}
@@ -102,7 +102,7 @@ export default function Home() {
         
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {[
-            { name: 'Toyota Prado Brake Pads (Front) - Genuine', price: 12500, rating: 4.8, reviews: 124, seller: 'AutoParts KE', image: '/products/brake-pads.png', badge: 'Best Seller', badgeColor: 'bg-brandRed' },
+            { name: 'Toyota Prado Brake Pads (Front) - Genuine', price: 12500, rating: 4.8, reviews: 124, seller: 'AutoParts KE', image: '/products/brake-pads.png', badge: 'Best Seller', badgeColor: 'bg-calreeGreen text-slate-950' },
             { name: 'Alternator 12V 150A - Denso (Keunner/Prado)', price: 28000, rating: 4.7, reviews: 98, seller: 'PowerParts Ltd', image: '/products/alternator.png', badge: 'Fast Delivery', badgeColor: 'bg-blue-600' },
             { name: 'Android Car Multimedia (Universal 9")', price: 18500, rating: 4.6, reviews: 73, seller: 'TechAuto Solutions', image: '/products/multimedia.png', badge: 'Popular', badgeColor: 'bg-emerald-600' },
             { name: 'LED Headlight Bulbs H11 (6000K)', price: 4200, rating: 4.5, reviews: 66, seller: 'AutoLED Kenya', image: '/products/led-bulbs.png', badge: 'New', badgeColor: 'bg-blue-500' },
@@ -165,7 +165,7 @@ export default function Home() {
             <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">MORE THAN JUST PARTS</p>
             <h2 className="text-3xl md:text-5xl font-extrabold text-white leading-tight mb-4">Complete Automotive<br/>Solutions</h2>
             <p className="text-gray-300 text-sm md:text-base mb-8 max-w-sm">Find trusted mechanics, skilled technicians, import parts, and more — all in one platform.</p>
-            <a href="/services/import" className="bg-brandRed text-white px-6 py-3 rounded-full font-bold shadow-soft hover:bg-red-700 transition inline-flex items-center w-max">
+            <a href="/services/import" className="bg-calreeGreen text-slate-950 px-6 py-3 rounded-full font-black shadow-soft hover:bg-emerald-400 transition inline-flex items-center w-max">
               Explore Services <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
           </div>

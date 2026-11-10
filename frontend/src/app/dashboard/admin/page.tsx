@@ -104,7 +104,7 @@ export default function AdminDashboard() {
           <span className="text-[10px] bg-brandRed text-white font-extrabold px-3 py-1 rounded-sm uppercase tracking-wider mb-2 inline-block">
             System Operations
           </span>
-          <h1 className="text-3xl font-extrabold text-brandDark">PARTSOKO Command Center</h1>
+          <h1 className="text-3xl font-extrabold text-brandDark">CALREE Command Center</h1>
           <p className="text-xs text-gray-500">Platform governance, foreign import quoting, and financial controls.</p>
         </div>
         <div className="flex space-x-2">
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
                   <input required type="number" value={duty} onChange={e => setDuty(e.target.value)} placeholder="12000" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">PARTSOKO Fee (KES) *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">CALREE Fee (KES) *</label>
                   <input required type="number" value={serviceFee} onChange={e => setServiceFee(e.target.value)} placeholder="4500" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
                 </div>
               </div>

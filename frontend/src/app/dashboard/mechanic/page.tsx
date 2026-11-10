@@ -191,7 +191,7 @@ export default function MechanicDashboard() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-bold text-base text-brandDark mb-2">Trade Parts Discount</h3>
             <p className="text-xs text-gray-500 leading-relaxed mb-4">
-              As a registered PARTSOKO mechanic, you receive <strong>10% trade discount</strong> on all spare parts ordered for client repairs.
+              As a registered CALREE mechanic, you receive <strong>10% trade discount</strong> on all spare parts ordered for client repairs.
             </p>
             <a
               href="/search"
@@ -204,7 +204,7 @@ export default function MechanicDashboard() {
           <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 text-xs text-gray-600 space-y-2">
             <h4 className="font-bold text-brandDark text-sm mb-1">Mechanic Guidelines</h4>
             <p>1. Always perform pre-repair inspection with the customer.</p>
-            <p>2. Use genuine parts sourced from PARTSOKO to maintain warranty.</p>
+            <p>2. Use genuine parts sourced from CALREE to maintain warranty.</p>
             <p>3. Mark job as complete once the customer takes test drive.</p>
           </div>
         </div>

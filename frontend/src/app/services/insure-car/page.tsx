@@ -112,7 +112,7 @@ export default function InsuranceHub() {
         {/* Header */}
         <div className="text-center mb-10">
           <span className="text-brandRed font-bold text-xs uppercase tracking-widest bg-red-50 border border-red-200 px-3 py-1 rounded-full">
-            PARTSOKO Insurance Connect
+            CALREE Insurance Connect
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-3">
             Motor Vehicle Insurance Quotes & Instant Cover
@@ -212,7 +212,7 @@ export default function InsuranceHub() {
                   />
                 </div>
                 <p className="text-[11px] text-gray-400 mt-1">
-                  Need an official certified appraisal first? <a href="/services/value-car" className="text-brandRed hover:underline font-semibold">Value your car with PARTSOKO &rarr;</a>
+                  Need an official certified appraisal first? <a href="/services/value-car" className="text-brandRed hover:underline font-semibold">Value your car with CALREE &rarr;</a>
                 </p>
               </div>
 
@@ -404,7 +404,7 @@ export default function InsuranceHub() {
               Insurance Policy Initiated!
             </h2>
             <p className="text-sm text-gray-600 mb-6">
-              Your application has been received by PARTSOKO Insurance Intermediary Desk and routed to {selectedQuote.provider}.
+              Your application has been received by CALREE Insurance Intermediary Desk and routed to {selectedQuote.provider}.
             </p>
 
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-left mb-6 space-y-2.5 text-xs">
@@ -432,7 +432,7 @@ export default function InsuranceHub() {
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a 
-                href={`https://wa.me/254702420404?text=Hello%20PARTSOKO%2C%20I%20have%20applied%20for%20insurance%20ref%20${policyRef}`} 
+                href={`https://wa.me/254702420404?text=Hello%20CALREE%2C%20I%20have%20applied%20for%20insurance%20ref%20${policyRef}`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="px-6 py-2.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition shadow flex items-center justify-center"

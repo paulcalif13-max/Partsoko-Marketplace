@@ -51,7 +51,7 @@ export const initiateMpesaPayment = async (req: Request, res: Response) => {
             PartyB: shortCode,
             PhoneNumber: formattedPhone,
             CallBackURL: `${process.env.BASE_URL || 'http://localhost:5000'}/api/payments/mpesa/callback`,
-            AccountReference: `PARTSOKO_${orderId || 'WEB'}`,
+            AccountReference: `CALREE_${orderId || 'WEB'}`,
             TransactionDesc: 'Auto Spare Parts Purchase'
           },
           { headers: { Authorization: `Bearer ${accessToken}` } }

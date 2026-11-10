@@ -29,7 +29,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
     if (mechanic.phone) {
       await sendWhatsApp(mechanic.phone, `New booking request from ${req.user.name} on ${new Date(serviceDate).toLocaleDateString()}. Notes: ${notes}`);
     }
-    await sendEmail(mechanic.email, 'New PARTSOKO Booking', `You have a new booking from ${req.user.name}.`);
+    await sendEmail(mechanic.email, 'New CALREE Booking', `You have a new booking from ${req.user.name}.`);
 
     res.status(201).json(booking);
   } catch (error) {
@@ -79,7 +79,7 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
 
     // Notify User
     if (booking.user.phone) {
-      await sendWhatsApp(booking.user.phone, `Your booking on PARTSOKO has been ${status} by the mechanic.`);
+      await sendWhatsApp(booking.user.phone, `Your booking on CALREE has been ${status} by the mechanic.`);
     }
 
     res.json(updatedBooking);

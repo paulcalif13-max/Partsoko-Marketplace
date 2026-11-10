@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Bug report received. Thank you for helping us improve PARTSOKO!',
+      message: 'Bug report received. Thank you for helping us improve CALREE!',
       reportId,
     });
   } catch (error: any) {

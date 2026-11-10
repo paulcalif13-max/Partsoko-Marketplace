@@ -14,7 +14,7 @@ export default function ContactPage() {
               We're Here to Help
             </span>
             <h1 className="text-3xl md:text-4xl font-extrabold text-brandDark mb-3">
-              Contact PARTSOKO Support
+              Contact CALREE Support
             </h1>
             <p className="text-gray-500 text-sm">
               Have questions about spare parts fitment, global orders, mechanic bookings, or merchant onboarding?

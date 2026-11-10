@@ -33,7 +33,7 @@ const EVENTS_DATA: EventItem[] = [
     title: 'Modern Common-Rail & Hybrid Diagnostics Masterclass',
     date: 'April 14, 2026',
     time: '2:00 PM - 5:30 PM EAT',
-    location: 'PARTSOKO Training Hub, Ruaka & Live Stream',
+    location: 'CALREE Training Hub, Ruaka & Live Stream',
     type: 'Hybrid Workshop',
     badge: 'TECHNICAL TRAINING',
     image: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80',
@@ -96,7 +96,7 @@ export default function Events() {
           Upcoming Automotive Events
         </h1>
         <p className="text-base text-gray-600 max-w-2xl mx-auto">
-          Connect with Kenya's leading auto mechanics, parts vendors, restorers, and motorsport enthusiasts at official PARTSOKO conventions.
+          Connect with Kenya's leading auto mechanics, parts vendors, restorers, and motorsport enthusiasts at official CALREE conventions.
         </p>
       </div>
 

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const referenceCode = `IMP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
     const whatsappMessage = encodeURIComponent(
-      `🌐 GLOBAL IMPORT INQUIRY - PARTSOKO\n\n` +
+      `🌐 GLOBAL IMPORT INQUIRY - CALREE\n\n` +
       `*Reference:* ${referenceCode}\n` +
       `*Customer:* ${name}\n` +
       `*Phone:* ${phone}\n` +

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const referenceCode = `TOW-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
     const whatsappMessage = encodeURIComponent(
-      `🚨 EMERGENCY TOWING REQUEST - PARTSOKO\n\n` +
+      `🚨 EMERGENCY TOWING REQUEST - CALREE\n\n` +
       `*Reference:* ${referenceCode}\n` +
       `*Customer:* ${customerName}\n` +
       `*Phone:* ${phone}\n` +

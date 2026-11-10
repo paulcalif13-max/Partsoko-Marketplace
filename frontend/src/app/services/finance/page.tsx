@@ -124,7 +124,7 @@ export default function FinanceHub() {
         setWhatsappUrl(data.whatsappUrl);
       } else {
         const fallbackMsg = encodeURIComponent(
-          `Habari PARTSOKO, I have submitted a Financing Application.\n\n` +
+          `Habari CALREE, I have submitted a Financing Application.\n\n` +
           `*Reference Code:* ${code}\n` +
           `*Applicant:* ${formData.applicantName}\n` +
           `*Phone:* ${formData.phone}\n` +
@@ -141,7 +141,7 @@ export default function FinanceHub() {
       const fallbackCode = `FIN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
       setReferenceCode(fallbackCode);
       const fallbackMsg = encodeURIComponent(
-        `Habari PARTSOKO, I have submitted a Financing Application.\n\n` +
+        `Habari CALREE, I have submitted a Financing Application.\n\n` +
         `*Reference Code:* ${fallbackCode}\n` +
         `*Applicant:* ${formData.applicantName}\n` +
         `*Phone:* ${formData.phone}\n` +
@@ -163,7 +163,7 @@ export default function FinanceHub() {
         {/* Header */}
         <div className="text-center mb-10">
           <span className="text-brandRed font-bold text-xs uppercase tracking-widest bg-red-50 border border-red-200 px-3 py-1 rounded-full">
-            PARTSOKO Auto Financial Solutions
+            CALREE Auto Financial Solutions
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-3">
             Automotive Financing & Overhaul Credit
@@ -485,7 +485,7 @@ export default function FinanceHub() {
                 Financing Application Submitted!
               </h2>
               <p className="text-sm text-gray-600 mb-6">
-                Your loan appraisal is currently queued for fast-track review with PARTSOKO lending partners.
+                Your loan appraisal is currently queued for fast-track review with CALREE lending partners.
               </p>
 
               {/* Reference Card */}
@@ -533,7 +533,7 @@ export default function FinanceHub() {
               {/* Instant WhatsApp Verification Button */}
               <div className="my-6">
                 <a
-                  href={whatsappUrl || `https://wa.me/254702420404?text=Habari%20PARTSOKO,%20my%20financing%20reference%20code%20is%20${referenceCode}`}
+                  href={whatsappUrl || `https://wa.me/254702420404?text=Habari%20CALREE,%20my%20financing%20reference%20code%20is%20${referenceCode}`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-full bg-[#25D366] hover:bg-green-600 text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-md flex items-center justify-center space-x-2 transition transform active:scale-[0.99]"

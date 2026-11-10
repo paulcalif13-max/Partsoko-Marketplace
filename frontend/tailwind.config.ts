@@ -11,8 +11,12 @@ const config: Config = {
       colors: {
         primary: "#2563eb", /* Vibrant Blue */
         secondary: "#1e293b", /* Dark Navy / Slate 800 */
-        brandDark: "#0f172a", /* Almost black for footer/text */
-        brandRed: "#ef4444", /* Red accent for logo and buttons */
+        brandDark: "#0B1120", /* Calree deep midnight slate */
+        brandRed: "#ef4444", /* Red accent */
+        calreeGreen: "#00D066", /* Vibrant Calree Emerald Green */
+        calreeGreenDark: "#059669",
+        calreeGreenLight: "#34D399",
+        calreeDark: "#0B1120",
         surface: "#f8fafc", /* Light background */
       },
       boxShadow: {

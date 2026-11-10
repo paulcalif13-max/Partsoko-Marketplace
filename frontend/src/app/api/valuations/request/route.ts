@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const referenceCode = `VAL-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
     const whatsappMessage = encodeURIComponent(
-      `🔍 VEHICLE VALUATION BOOKING - PARTSOKO\n\n` +
+      `🔍 VEHICLE VALUATION BOOKING - CALREE\n\n` +
       `*Reference:* ${referenceCode}\n` +
       `*Owner:* ${ownerName}\n` +
       `*Phone:* ${phone}\n` +

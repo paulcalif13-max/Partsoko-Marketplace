@@ -129,14 +129,14 @@ export default function MechanicsPage() {
         {/* Header Banner */}
         <div className="bg-brandDark text-white rounded-2xl p-8 md:p-12 mb-10 shadow-soft relative overflow-hidden">
           <div className="relative z-10 max-w-2xl">
-            <span className="bg-brandRed text-white text-[10px] font-bold px-3 py-1 rounded-sm uppercase tracking-widest inline-block mb-3">
+            <span className="bg-calreeGreen text-slate-950 text-[10px] font-black px-3 py-1 rounded-sm uppercase tracking-widest inline-block mb-3">
               Verified Auto Technicians
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">
               Find Trusted Mechanics & Garages Near You
             </h1>
             <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6">
-              Book certified mechanics with verified customer reviews, clear transparent pricing, and guaranteed genuine parts delivery from PARTSOKO.
+              Book certified mechanics with verified customer reviews, clear transparent pricing, and guaranteed genuine parts delivery from CALREE.
             </p>
             
             {/* Search Input */}

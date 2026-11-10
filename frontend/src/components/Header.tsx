@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import CartBadge from './CartBadge';
+import CalreeLogo from './CalreeLogo';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,14 +19,16 @@ export default function Header() {
       <div className="bg-brandDark text-gray-300 text-xs py-2 px-3 sm:px-6 lg:px-8 flex justify-between items-center border-b border-gray-800">
         <div className="flex items-center space-x-2 sm:space-x-4">
           <span className="flex items-center text-[11px] sm:text-xs font-medium">
-            <svg className="w-3.5 h-3.5 mr-1 text-brandRed flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 mr-1 text-calreeGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg> 
             Nairobi, Kenya
           </span>
           <span className="hidden sm:inline text-gray-600">|</span>
-          <span className="hidden sm:inline text-gray-400 text-xs">Trusted Automotive Parts Marketplace</span>
+          <span className="hidden sm:inline text-emerald-400 font-medium text-xs tracking-wide">
+            Better parts. Smoother journeys.
+          </span>
         </div>
 
         {/* Desktop Top Links */}
@@ -79,17 +82,8 @@ export default function Header() {
               </svg>
             </button>
 
-            <a href="/" className="flex items-center flex-shrink-0">
-              <img 
-                src="/partsoko-logo.jpg" 
-                alt="PARTSOKO Logo" 
-                className="h-8 sm:h-11 w-auto object-contain" 
-              />
-              <div className="hidden lg:flex flex-col ml-2 mt-1">
-                <span className="text-[10px] font-extrabold text-gray-500 tracking-wider leading-none">
-                  AUTO PARTS MARKETPLACE
-                </span>
-              </div>
+            <a href="/" className="flex items-center flex-shrink-0" title="CALREE Automotive Marketplace">
+              <CalreeLogo variant="header" size="md" />
             </a>
           </div>
 
@@ -276,8 +270,7 @@ export default function Header() {
             {/* Drawer Header */}
             <div className="p-4 bg-brandDark text-white flex items-center justify-between border-b border-gray-800">
               <a href="/" onClick={closeMenu} className="flex items-center">
-                <img src="/partsoko-logo.jpg" alt="PARTSOKO Logo" className="h-8 w-auto rounded bg-white p-0.5 mr-2" />
-                <span className="text-xs font-bold tracking-widest text-gray-300">PARTSOKO</span>
+                <CalreeLogo variant="dark" size="sm" showSubtitle={true} />
               </a>
               <button 
                 type="button" 

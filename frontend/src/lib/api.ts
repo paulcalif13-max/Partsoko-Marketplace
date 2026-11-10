@@ -1,5 +1,5 @@
 /**
- * Centralized API configuration for PARTSOKO.
+ * Centralized API configuration for CALREE Automotive Marketplace.
  * In production on Vercel, requests route to '/api' on the same domain,
  * eliminating CORS issues, mixed content blocks, and localhost failures.
  */

@@ -184,11 +184,11 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               {/* Price */}
               <div className="bg-red-50/60 border border-red-100 rounded-xl p-4 mb-6 flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs text-gray-500 block">PARTSOKO Price</span>
+                  <span className="text-xs text-gray-500 block">CALREE Price</span>
                   <div className="text-3xl sm:text-4xl font-extrabold text-brandRed">
                     KES {product.price.toLocaleString()}
                   </div>
-                  <span className="text-[10px] text-gray-500">VAT & PARTSOKO buyer protection included</span>
+                  <span className="text-[10px] text-gray-500">VAT & CALREE buyer protection included</span>
                 </div>
                 <div className="text-right">
                   <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded">
@@ -249,7 +249,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
               <div className="flex justify-between items-center text-xs text-gray-500 pt-2">
                 <a 
-                  href={`https://wa.me/254702420404?text=Hi%20PARTSOKO%2C%20I%20am%20inquiring%20about%20Part%20${product.partNumber || product.name}`} 
+                  href={`https://wa.me/254702420404?text=Hi%20CALREE%2C%20I%20am%20inquiring%20about%20Part%20${product.partNumber || product.name}`} 
                   target="_blank" 
                   rel="noreferrer" 
                   className="text-green-700 font-semibold hover:underline flex items-center"

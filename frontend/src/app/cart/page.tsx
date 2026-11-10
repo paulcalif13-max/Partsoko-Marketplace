@@ -47,7 +47,7 @@ export default function CartPage() {
                     </div>
                     <div>
                       <h3 className="text-sm sm:text-base font-bold text-brandDark leading-snug">{item.name}</h3>
-                      <p className="text-xs text-gray-500 mt-1">Sold by: <span className="font-semibold text-gray-700">{item.seller || 'PARTSOKO Verified Vendor'}</span></p>
+                      <p className="text-xs text-gray-500 mt-1">Sold by: <span className="font-semibold text-gray-700">{item.seller || 'CALREE Verified Vendor'}</span></p>
                       <p className="text-xs font-bold text-primary mt-1">KES {item.price.toLocaleString()}</p>
                     </div>
                   </div>

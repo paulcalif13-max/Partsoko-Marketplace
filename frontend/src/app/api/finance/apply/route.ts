@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     // Pre-composed WhatsApp confirmation message for the applicant
     const whatsappMessage = encodeURIComponent(
-      `Habari PARTSOKO, I have submitted a Financing Application.\n\n` +
+      `Habari CALREE, I have submitted a Financing Application.\n\n` +
       `*Reference Code:* ${referenceCode}\n` +
       `*Applicant:* ${applicantName}\n` +
       `*Phone:* ${phone}\n` +

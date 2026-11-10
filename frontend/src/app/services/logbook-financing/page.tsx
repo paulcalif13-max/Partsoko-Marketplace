@@ -27,7 +27,7 @@ export default function LogbookFinancing() {
           </div>
           <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
             <h3 className="text-sm font-bold text-gray-900 mb-2">🛡️ Certified Valuations</h3>
-            <p className="text-xs text-gray-600">Integrated with PARTSOKO certified motor valuers across Nairobi and Kiambu.</p>
+            <p className="text-xs text-gray-600">Integrated with CALREE certified motor valuers across Nairobi and Kiambu.</p>
           </div>
         </div>
 
