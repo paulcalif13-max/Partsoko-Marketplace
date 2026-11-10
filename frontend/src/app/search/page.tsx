@@ -249,8 +249,8 @@ export default function SearchPage() {
                           setAddedItem(prod.id);
                           setTimeout(() => setAddedItem(null), 1500);
                         }}
-                        className={`text-[10px] px-3.5 py-1.5 rounded-lg font-bold transition shadow-sm ${
-                          addedItem === prod.id ? 'bg-green-600 text-white' : 'bg-brandDark text-white hover:bg-brandRed'
+                        className={`text-[10px] px-3.5 py-1.5 rounded-lg font-black transition shadow-sm ${
+                          addedItem === prod.id ? 'bg-slate-900 text-calreeGreen border border-calreeGreen' : 'bg-calreeGreen text-slate-950 hover:bg-emerald-400 active:scale-95'
                         }`}
                       >
                         {addedItem === prod.id ? 'Added! ✓' : 'Add to Cart'}

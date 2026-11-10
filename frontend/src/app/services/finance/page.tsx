@@ -162,7 +162,7 @@ export default function FinanceHub() {
         
         {/* Header */}
         <div className="text-center mb-10">
-          <span className="text-brandRed font-bold text-xs uppercase tracking-widest bg-red-50 border border-red-200 px-3 py-1 rounded-full">
+          <span className="text-emerald-800 font-bold text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-200 px-3.5 py-1 rounded-full">
             CALREE Auto Financial Solutions
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-3">
@@ -178,7 +178,7 @@ export default function FinanceHub() {
           <div className="flex items-center justify-between relative">
             <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
             <div 
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-brandRed z-0 transition-all duration-300"
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-calreeGreen z-0 transition-all duration-300"
               style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
             ></div>
             
@@ -189,8 +189,8 @@ export default function FinanceHub() {
               { num: 4, title: 'Approval' }
             ].map(step => (
               <div key={step.num} className="relative z-10 flex flex-col items-center">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${
-                  step.num <= currentStep ? 'bg-brandRed text-white ring-4 ring-red-100 shadow' : 'bg-gray-200 text-gray-500'
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-colors duration-300 ${
+                  step.num <= currentStep ? 'bg-calreeGreen text-slate-950 shadow-sm' : 'bg-gray-200 text-gray-500'
                 }`}>
                   {step.num < currentStep ? '✓' : step.num}
                 </div>
@@ -218,21 +218,21 @@ export default function FinanceHub() {
                   <div 
                     key={prod.id}
                     onClick={() => handleProductSelect(prod)}
-                    className="p-6 border-2 border-gray-100 rounded-xl hover:border-brandRed hover:bg-red-50/40 transition-all cursor-pointer group flex flex-col justify-between"
+                    className="p-6 border-2 border-gray-100 rounded-xl hover:border-calreeGreen hover:bg-emerald-50/20 transition-all cursor-pointer group flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-4xl group-hover:scale-110 transition-transform">{prod.icon}</span>
-                        <span className="text-[10px] font-bold text-brandRed bg-red-50 border border-red-200 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full">
                           KES {prod.min.toLocaleString()} - {prod.max.toLocaleString()}
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-brandRed transition mb-1">{prod.name}</h3>
+                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-emerald-700 transition mb-1">{prod.name}</h3>
                       <p className="text-gray-600 text-xs leading-relaxed">{prod.desc}</p>
                     </div>
                     <div className="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500">
                       <span>Rate from {(prod.rate * 100).toFixed(1)}%/mo</span>
-                      <span className="text-brandRed group-hover:underline">Configure & Apply &rarr;</span>
+                      <span className="text-emerald-700 font-bold group-hover:underline">Configure & Apply &rarr;</span>
                     </div>
                   </div>
                 ))}
@@ -245,12 +245,12 @@ export default function FinanceHub() {
             <div className="max-w-2xl mx-auto">
               <div className="flex items-center justify-between border-b pb-4 mb-6">
                 <div>
-                  <span className="text-xs font-bold text-brandRed uppercase tracking-wider">{selectedProduct.name}</span>
+                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">{selectedProduct.name}</span>
                   <h2 className="text-2xl font-bold text-gray-900">Configure Loan & Repayment</h2>
                 </div>
                 <button 
                   onClick={() => setCurrentStep(1)} 
-                  className="text-xs text-gray-500 hover:text-brandRed underline"
+                  className="text-xs text-gray-500 hover:text-emerald-700 underline"
                 >
                   Change Product
                 </button>
@@ -261,7 +261,7 @@ export default function FinanceHub() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-sm font-bold text-gray-700">Requested Amount</label>
-                    <span className="text-xl font-extrabold text-brandRed">
+                    <span className="text-xl font-extrabold text-slate-900">
                       KES {amount.toLocaleString()}
                     </span>
                   </div>
@@ -272,7 +272,7 @@ export default function FinanceHub() {
                     step={5000}
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brandRed"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                   />
                   <div className="flex justify-between text-[11px] text-gray-400 mt-1">
                     <span>KES {selectedProduct.min.toLocaleString()}</span>
@@ -311,7 +311,7 @@ export default function FinanceHub() {
                     </div>
                     <div className="pl-4">
                       <p className="text-xs text-gray-500 mb-1">Total Repayment Amount</p>
-                      <p className="text-2xl font-extrabold text-brandRed">KES {totalRepayment.toLocaleString()}</p>
+                      <p className="text-2xl font-extrabold text-emerald-700">KES {totalRepayment.toLocaleString()}</p>
                       <p className="text-[10px] text-gray-400 mt-0.5">Spread over {tenure} equal installments</p>
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function FinanceHub() {
                   </button>
                   <button 
                     onClick={() => setCurrentStep(3)} 
-                    className="px-8 py-2.5 bg-brandRed text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow transition"
+                    className="px-8 py-2.5 bg-calreeGreen text-slate-950 font-black rounded-lg text-sm hover:bg-emerald-400 shadow transition active:scale-95"
                   >
                     Proceed to Application &rarr;
                   </button>
@@ -339,7 +339,7 @@ export default function FinanceHub() {
           {currentStep === 3 && (
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
               <div className="border-b pb-4 mb-6">
-                <span className="text-xs font-bold text-brandRed uppercase tracking-wider">{selectedProduct.name} Application</span>
+                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">{selectedProduct.name} Application</span>
                 <h2 className="text-2xl font-bold text-gray-900">Borrower & Vehicle Information</h2>
                 <p className="text-xs text-gray-500 mt-1">Please provide accurate info for same-day credit appraisal.</p>
               </div>
@@ -360,7 +360,7 @@ export default function FinanceHub() {
                       placeholder="e.g. John Mwangi" 
                       value={formData.applicantName}
                       onChange={(e) => setFormData({...formData, applicantName: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     />
                   </div>
                   <div>
@@ -371,7 +371,7 @@ export default function FinanceHub() {
                       placeholder="e.g. 0712345678" 
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     />
                   </div>
                 </div>
@@ -384,7 +384,7 @@ export default function FinanceHub() {
                       placeholder="e.g. mwangi@gmail.com" 
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     />
                   </div>
                   <div>
@@ -395,7 +395,7 @@ export default function FinanceHub() {
                       placeholder="e.g. KDH 456X" 
                       value={formData.vehicleReg}
                       onChange={(e) => setFormData({...formData, vehicleReg: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none uppercase"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none uppercase"
                     />
                   </div>
                 </div>
@@ -408,7 +408,7 @@ export default function FinanceHub() {
                       placeholder="e.g. Toyota Prado TX / Mazda CX-5" 
                       value={formData.vehicleMakeModel}
                       onChange={(e) => setFormData({...formData, vehicleMakeModel: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     />
                   </div>
                   <div>
@@ -418,7 +418,7 @@ export default function FinanceHub() {
                       placeholder="2017" 
                       value={formData.vehicleYear}
                       onChange={(e) => setFormData({...formData, vehicleYear: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     />
                   </div>
                 </div>
@@ -429,7 +429,7 @@ export default function FinanceHub() {
                     <select 
                       value={formData.employmentStatus}
                       onChange={(e) => setFormData({...formData, employmentStatus: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     >
                       <option>Employed (Salaried)</option>
                       <option>Business Owner / Self-Employed</option>
@@ -443,7 +443,7 @@ export default function FinanceHub() {
                       placeholder="120000" 
                       value={formData.monthlyIncome}
                       onChange={(e) => setFormData({...formData, monthlyIncome: e.target.value})}
-                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                      className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                     />
                   </div>
                 </div>
@@ -463,7 +463,7 @@ export default function FinanceHub() {
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="px-8 py-2.5 bg-brandRed text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow transition disabled:opacity-50"
+                    className="px-8 py-2.5 bg-calreeGreen text-slate-950 font-black rounded-lg text-sm hover:bg-emerald-400 shadow transition disabled:opacity-50 active:scale-95"
                   >
                     {loading ? 'Submitting Application...' : 'Submit Application Now'}
                   </button>
@@ -496,7 +496,7 @@ export default function FinanceHub() {
                     <span className="text-xs text-gray-400">Save this code to track your status</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg font-mono font-extrabold text-brandRed tracking-wide">{referenceCode}</span>
+                    <span className="text-lg font-mono font-extrabold text-emerald-700 tracking-wide">{referenceCode}</span>
                     <button 
                       type="button"
                       onClick={() => {
@@ -518,7 +518,7 @@ export default function FinanceHub() {
                 </div>
                 <div className="flex justify-between items-center border-b pb-2">
                   <span className="text-xs text-gray-500">Requested Amount</span>
-                  <span className="text-xs font-bold text-brandRed">KES {amount.toLocaleString()}</span>
+                  <span className="text-xs font-bold text-slate-900">KES {amount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center border-b pb-2">
                   <span className="text-xs text-gray-500">Tenure</span>

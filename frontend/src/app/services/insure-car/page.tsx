@@ -111,7 +111,7 @@ export default function InsuranceHub() {
         
         {/* Header */}
         <div className="text-center mb-10">
-          <span className="text-brandRed font-bold text-xs uppercase tracking-widest bg-red-50 border border-red-200 px-3 py-1 rounded-full">
+          <span className="text-emerald-800 font-bold text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-200 px-3.5 py-1 rounded-full">
             CALREE Insurance Connect
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-3">
@@ -127,7 +127,7 @@ export default function InsuranceHub() {
           <div className="flex items-center justify-between relative">
             <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
             <div 
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-brandRed z-0 transition-all duration-300"
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-calreeGreen z-0 transition-all duration-300"
               style={{ width: `${((step - 1) / 3) * 100}%` }}
             ></div>
             
@@ -138,8 +138,8 @@ export default function InsuranceHub() {
               { num: 4, title: 'Policy' }
             ].map(s => (
               <div key={s.num} className="relative z-10 flex flex-col items-center">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-colors duration-300 ${
-                  s.num <= step ? 'bg-brandRed text-white ring-4 ring-red-100 shadow' : 'bg-gray-200 text-gray-500'
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-colors duration-300 ${
+                  s.num <= step ? 'bg-calreeGreen text-slate-950 shadow-sm' : 'bg-gray-200 text-gray-500'
                 }`}>
                   {s.num < step ? '✓' : s.num}
                 </div>
@@ -164,7 +164,7 @@ export default function InsuranceHub() {
                 <label className="block text-xs font-bold text-gray-700 mb-1">Make & Model</label>
                 <input 
                   type="text" 
-                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none" 
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none" 
                   placeholder="e.g. Mazda CX-5, Toyota Harrier, Subaru Outback" 
                   value={vehicle.makeModel}
                   onChange={e => setVehicle({...vehicle, makeModel: e.target.value})} 
@@ -176,7 +176,7 @@ export default function InsuranceHub() {
                   <label className="block text-xs font-bold text-gray-700 mb-1">Year of Manufacture</label>
                   <input 
                     type="number" 
-                    className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none" 
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none" 
                     placeholder="2018" 
                     value={vehicle.year}
                     onChange={e => setVehicle({...vehicle, year: e.target.value})} 
@@ -187,7 +187,7 @@ export default function InsuranceHub() {
                   <select 
                     value={vehicle.usage}
                     onChange={e => setVehicle({...vehicle, usage: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg p-3 text-sm bg-white focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    className="w-full border border-gray-300 rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                   >
                     <option>Private</option>
                     <option>Commercial (General Cartage)</option>
@@ -205,20 +205,20 @@ export default function InsuranceHub() {
                   <span className="absolute left-3 top-3 text-sm font-bold text-gray-400">KES</span>
                   <input 
                     type="number" 
-                    className="w-full pl-14 border border-gray-300 rounded-lg p-3 text-sm font-bold text-gray-900 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none" 
+                    className="w-full pl-14 border border-gray-300 rounded-lg p-3 text-sm font-bold text-gray-900 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none" 
                     placeholder="2500000" 
                     value={vehicle.value}
                     onChange={e => setVehicle({...vehicle, value: Number(e.target.value)})} 
                   />
                 </div>
                 <p className="text-[11px] text-gray-400 mt-1">
-                  Need an official certified appraisal first? <a href="/services/value-car" className="text-brandRed hover:underline font-semibold">Value your car with CALREE &rarr;</a>
+                  Need an official certified appraisal first? <a href="/services/value-car" className="text-emerald-700 hover:underline font-semibold">Value your car with CALREE &rarr;</a>
                 </p>
               </div>
 
               <button 
                 onClick={() => setStep(2)} 
-                className="w-full bg-brandRed text-white py-3.5 rounded-lg font-bold mt-4 hover:bg-red-700 transition shadow"
+                className="w-full bg-calreeGreen text-slate-950 font-black py-3.5 rounded-lg mt-4 hover:bg-emerald-400 transition shadow active:scale-95"
               >
                 Compare Instant Underwriter Quotations &rarr;
               </button>
@@ -238,7 +238,7 @@ export default function InsuranceHub() {
               </div>
               <button 
                 onClick={() => setStep(1)} 
-                className="text-xs font-semibold text-brandRed hover:underline mt-2 sm:mt-0"
+                className="text-xs font-semibold text-emerald-700 hover:underline mt-2 sm:mt-0"
               >
                 &larr; Modify Vehicle Details
               </button>
@@ -250,7 +250,7 @@ export default function InsuranceHub() {
                 return (
                   <div 
                     key={quote.id} 
-                    className="bg-white rounded-2xl shadow border border-gray-200 p-6 flex flex-col justify-between hover:border-brandRed hover:shadow-xl transition relative overflow-hidden"
+                    className="bg-white rounded-2xl shadow border border-gray-200 p-6 flex flex-col justify-between hover:border-calreeGreen hover:shadow-xl transition relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 bg-brandDark text-white text-[9px] font-bold px-2.5 py-1 rounded-bl-lg">
                       {quote.bestFor}
@@ -259,7 +259,7 @@ export default function InsuranceHub() {
                     <div>
                       <div className="text-3xl mb-2">{quote.logo}</div>
                       <h3 className="text-lg font-bold text-gray-900 mb-0.5">{quote.provider}</h3>
-                      <p className="text-xs font-semibold text-brandRed mb-4">{quote.type}</p>
+                      <p className="text-xs font-semibold text-emerald-700 mb-4">{quote.type}</p>
 
                       <div className="mb-5 pb-4 border-b border-gray-100">
                         <span className="text-xs text-gray-400 block">Annual Premium</span>
@@ -284,7 +284,7 @@ export default function InsuranceHub() {
 
                     <button 
                       onClick={() => handleSelectQuote(quote)} 
-                      className="w-full bg-brandDark text-white py-2.5 rounded-lg text-xs font-bold hover:bg-brandRed transition shadow"
+                      className="w-full bg-slate-900 text-calreeGreen py-2.5 rounded-lg text-xs font-bold hover:bg-slate-800 transition shadow border border-slate-700 active:scale-95"
                     >
                       Select & Apply Now
                     </button>
@@ -299,10 +299,10 @@ export default function InsuranceHub() {
         {step === 3 && (
           <form onSubmit={handleSubmitPolicy} className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 max-w-2xl mx-auto">
             <div className="border-b pb-4 mb-6">
-              <span className="text-xs font-bold text-brandRed uppercase tracking-wider">{selectedQuote.provider}</span>
+              <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">{selectedQuote.provider}</span>
               <h2 className="text-2xl font-bold text-gray-900">3. Policy Applicant Details</h2>
               <p className="text-xs text-gray-500 mt-1">
-                Annual Premium: <strong className="text-brandRed">KES {calculatePremium(selectedQuote).toLocaleString()}</strong> for {vehicle.makeModel}
+                Annual Premium: <strong className="text-slate-900">KES {calculatePremium(selectedQuote).toLocaleString()}</strong> for {vehicle.makeModel}
               </p>
             </div>
 
@@ -315,7 +315,7 @@ export default function InsuranceHub() {
                   placeholder="e.g. Faith Wanjiku" 
                   value={applicant.fullName}
                   onChange={e => setApplicant({...applicant, fullName: e.target.value})}
-                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                 />
               </div>
 
@@ -328,7 +328,7 @@ export default function InsuranceHub() {
                     placeholder="e.g. 0712345678" 
                     value={applicant.phone}
                     onChange={e => setApplicant({...applicant, phone: e.target.value})}
-                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                   />
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export default function InsuranceHub() {
                     placeholder="e.g. wanjiku@example.com" 
                     value={applicant.email}
                     onChange={e => setApplicant({...applicant, email: e.target.value})}
-                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                   />
                 </div>
               </div>
@@ -352,7 +352,7 @@ export default function InsuranceHub() {
                     placeholder="e.g. KDL 789M" 
                     value={applicant.regNo}
                     onChange={e => setApplicant({...applicant, regNo: e.target.value})}
-                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 uppercase font-bold focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 uppercase font-bold focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                   />
                 </div>
                 <div>
@@ -362,7 +362,7 @@ export default function InsuranceHub() {
                     placeholder="e.g. 29384756" 
                     value={applicant.nationalId}
                     onChange={e => setApplicant({...applicant, nationalId: e.target.value})}
-                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-1 focus:ring-brandRed focus:border-brandRed outline-none"
+                    className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-calreeGreen focus:border-calreeGreen outline-none"
                   />
                 </div>
               </div>
@@ -382,7 +382,7 @@ export default function InsuranceHub() {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="px-8 py-2.5 bg-brandRed text-white rounded-lg text-sm font-bold hover:bg-red-700 shadow transition disabled:opacity-50"
+                  className="px-8 py-2.5 bg-calreeGreen text-slate-950 font-black rounded-lg text-sm hover:bg-emerald-400 shadow transition disabled:opacity-50 active:scale-95"
                 >
                   {isSubmitting ? 'Issuing Policy Inscription...' : 'Submit Application & Generate Cover Note'}
                 </button>
@@ -422,7 +422,7 @@ export default function InsuranceHub() {
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="text-gray-500">Coverage Type:</span>
-                <span className="font-bold text-brandRed">{selectedQuote.type}</span>
+                <span className="font-bold text-slate-900">{selectedQuote.type}</span>
               </div>
               <div className="flex justify-between pt-1 text-sm font-bold">
                 <span className="text-gray-700">Total Premium:</span>

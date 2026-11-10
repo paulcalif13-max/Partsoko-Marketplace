@@ -78,9 +78,6 @@ export default function Home() {
               <div className="h-28 mb-3 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden rounded-lg bg-gray-50/50">
                 <img src={cat.image} alt={cat.name} className="w-full h-full object-contain p-1" />
               </div>
-              <div className="absolute top-24 left-3 w-7 h-7 bg-calreeGreen text-slate-950 rounded-full flex items-center justify-center shadow-md border-2 border-white z-10">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </div>
               <h3 className="font-bold text-xs text-brandDark mt-1 leading-tight flex-grow">{cat.name}</h3>
               <div className="mt-auto pt-2 text-right">
                 <svg className="w-4 h-4 text-brandDark inline-block group-hover:text-calreeGreen transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
@@ -144,8 +141,8 @@ export default function Home() {
                     setAddedId(`fp-${i}`);
                     setTimeout(() => setAddedId(null), 1500);
                   }}
-                  className={`text-[10px] px-3 py-1.5 rounded font-bold transition ${
-                    addedId === `fp-${i}` ? 'bg-green-600 text-white' : 'bg-brandRed text-white hover:bg-red-700'
+                  className={`text-[10px] px-3.5 py-1.5 rounded-lg font-black transition tracking-wide ${
+                    addedId === `fp-${i}` ? 'bg-slate-900 text-calreeGreen border border-calreeGreen shadow-sm' : 'bg-calreeGreen text-slate-950 hover:bg-emerald-400 shadow-sm active:scale-95'
                   }`}
                 >
                   {addedId === `fp-${i}` ? 'Added! ✓' : 'Add to Cart'}

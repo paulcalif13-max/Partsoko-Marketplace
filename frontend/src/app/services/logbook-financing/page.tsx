@@ -2,7 +2,7 @@ export default function LogbookFinancing() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 border border-gray-100">
-        <span className="text-brandRed font-bold text-xs uppercase tracking-widest bg-red-50 border border-red-200 px-3 py-1 rounded-full">
+        <span className="text-emerald-800 font-bold text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-200 px-3.5 py-1 rounded-full">
           Instant Auto Equity
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4">
@@ -34,7 +34,7 @@ export default function LogbookFinancing() {
         <div className="flex flex-col sm:flex-row gap-4">
           <a 
             href="/services/finance" 
-            className="inline-flex justify-center items-center bg-brandRed text-white px-8 py-3.5 rounded-lg font-bold hover:bg-red-700 transition shadow text-sm"
+            className="inline-flex justify-center items-center bg-calreeGreen text-slate-950 px-8 py-3.5 rounded-lg font-black hover:bg-emerald-400 transition shadow text-sm active:scale-95"
           >
             Calculate Loan & Apply Now &rarr;
           </a>
