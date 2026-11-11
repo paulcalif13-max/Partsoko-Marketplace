@@ -9,6 +9,7 @@ export default function ImportQuotePage() {
   const [vehicleYear, setVehicleYear] = useState('');
   const [notes, setNotes] = useState('');
   const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('0702420404');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,6 +31,7 @@ export default function ImportQuotePage() {
           vehicleYear,
           notes,
           customerName,
+          customerEmail,
           customerPhone
         })
       });
@@ -90,7 +92,7 @@ export default function ImportQuotePage() {
                 <p className="text-xl font-black text-primary mt-1">{referenceCode}</p>
               </div>
               <p className="text-gray-600 mb-6 max-w-md mx-auto text-sm">
-                Our sourcing experts in Nairobi are verifying the supplier, customs duties, air/sea freight, and fitment for your vehicle. We will send a consolidated landed quote to <span className="font-bold text-brandDark">{customerPhone}</span>.
+                Our sourcing experts in Nairobi are verifying the supplier, customs duties, air/sea freight, and fitment for your vehicle. We will send a consolidated landed quote with official CALREE details to <span className="font-bold text-brandDark">{customerEmail ? `${customerEmail} and ${customerPhone}` : customerPhone}</span>.
               </p>
               <button 
                 onClick={() => setSubmitted(false)}
@@ -105,7 +107,7 @@ export default function ImportQuotePage() {
               {/* URL Input */}
               <div className="space-y-2">
                 <label className="block text-sm font-bold text-brandDark">
-                  Product Link (URL) <span className="text-brandRed">*</span>
+                  Product Link (URL) <span className="text-emerald-700">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -149,10 +151,14 @@ export default function ImportQuotePage() {
               {/* Contact Information */}
               <div className="pt-2 pb-2 border-b border-gray-100">
                 <h3 className="font-bold text-brandDark mb-1">Where Should We Send the Landed Quote?</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">Your Name</label>
                     <input type="text" value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="e.g. Paul M." className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Client Email Address *</label>
+                    <input type="email" required value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="e.g. client@company.com" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">Phone / WhatsApp *</label>
