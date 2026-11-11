@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import PartScannerModal from '../components/PartScannerModal';
 
 export default function Home() {
   const { addToCart } = useCart();
   const [addedId, setAddedId] = useState<string | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   return (
     <div className="bg-surface pb-12">
       {/* Hero Section */}
@@ -28,10 +30,19 @@ export default function Home() {
                 Genuine spare parts, automotive electronics, automotive components, and more — all in one place.
               </p>
               <div className="flex flex-wrap sm:flex-nowrap gap-3 sm:space-x-4">
-                <a href="/search" className="bg-calreeGreen text-slate-950 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-black shadow-soft hover:shadow-hover hover:bg-emerald-400 transition flex items-center justify-center text-xs sm:text-sm">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <button 
+                  onClick={() => setIsScannerOpen(true)}
+                  className="bg-calreeGreen text-slate-950 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-black shadow-soft hover:shadow-hover hover:bg-emerald-400 transition flex items-center justify-center text-xs sm:text-sm active:scale-95"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  Scan &amp; Match Part
+                </button>
+                <a href="/search" className="bg-slate-900/90 border border-slate-700 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-black hover:bg-slate-800 transition flex items-center justify-center text-xs sm:text-sm">
+                  <svg className="w-4 h-4 mr-2 text-calreeGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                   Shop Now 
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
                 <a href="/services/finance" className="border border-white/80 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-bold hover:bg-white hover:text-brandDark transition flex items-center justify-center text-xs sm:text-sm">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -42,7 +53,7 @@ export default function Home() {
               {/* Trust Indicators */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-5 sm:mt-6 text-[11px] sm:text-xs text-gray-300 font-medium">
                 <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> Genuine Parts</span>
-                <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> Verified Mechanics</span>
+                <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> 100% Fitment Guarantee</span>
                 <span className="flex items-center"><span className="text-green-400 mr-1.5 font-bold">✓</span> Lipa na M-Pesa</span>
               </div>
             </div>
@@ -50,6 +61,45 @@ export default function Home() {
             <div className="md:w-1/2 flex justify-end mt-10 md:mt-0 pr-8 hidden lg:flex">
               <p className="font-['Caveat',cursive] text-3xl font-bold text-white italic tracking-wider self-start mt-8 rotate-[-5deg]">Keep Your<br/>Vehicle Moving</p>
             </div>
+          </div>
+        </div>
+
+        {/* Quick Part Scanner Feature Strip */}
+        <div className="mt-4 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 text-white rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in-up">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-calreeGreen/20 border border-calreeGreen/40 flex items-center justify-center text-calreeGreen flex-shrink-0">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-white">Smart Spare Part Scanner &amp; Fitment Matcher</h3>
+                <span className="bg-calreeGreen text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wide">
+                  New Feature
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Scan part photo or enter OEM part number &amp; car model to check Kenya inventory and guarantee exact fitment.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 w-full md:w-auto">
+            <button
+              onClick={() => setIsScannerOpen(true)}
+              className="w-full md:w-auto bg-calreeGreen hover:bg-emerald-400 text-slate-950 font-black px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow"
+            >
+              <span>📷</span>
+              <span>Open Scanner</span>
+            </button>
+            <a
+              href="/scan"
+              className="w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs flex items-center justify-center transition border border-slate-700"
+            >
+              How It Works &rarr;
+            </a>
           </div>
         </div>
       </div>
@@ -227,6 +277,12 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Part Scanner Modal */}
+      <PartScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+      />
     </div>
   );
 }

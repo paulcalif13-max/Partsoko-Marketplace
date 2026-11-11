@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import CartBadge from './CartBadge';
 import CalreeLogo from './CalreeLogo';
+import PartScannerModal from './PartScannerModal';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const closeMenu = () => {
     setIsMobileMenuOpen(false);
@@ -89,7 +91,7 @@ export default function Header() {
 
           {/* Desktop Search Bar */}
           <form action="/search" method="GET" className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl mx-6">
-            <div className="flex w-full bg-gray-50 rounded-lg overflow-hidden border border-gray-300 focus-within:border-brandRed focus-within:ring-1 focus-within:ring-brandRed transition-all">
+            <div className="flex w-full bg-gray-50 rounded-lg overflow-hidden border border-gray-300 focus-within:border-calreeGreen focus-within:ring-1 focus-within:ring-calreeGreen transition-all">
               <div className="pl-4 flex items-center pointer-events-none">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -101,9 +103,21 @@ export default function Header() {
                 className="w-full bg-transparent border-none focus:ring-0 text-sm py-2.5 px-3 outline-none text-gray-800 placeholder-gray-400" 
                 placeholder="Search genuine parts, part numbers, brands, or car models..." 
               />
+              <button
+                type="button"
+                onClick={() => setIsScannerOpen(true)}
+                title="Scan or Upload Part Photo & Match Vehicle"
+                className="px-3 text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition flex items-center gap-1.5 border-l border-gray-200 text-xs font-bold"
+              >
+                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span className="hidden lg:inline text-[11px] font-black uppercase tracking-wider text-slate-800">Scan Part</span>
+              </button>
               <button 
                 type="submit" 
-                className="bg-brandDark text-white px-5 hover:bg-brandRed transition flex items-center justify-center font-medium"
+                className="bg-brandDark text-white px-5 hover:bg-calreeGreen hover:text-slate-950 transition flex items-center justify-center font-medium"
                 aria-label="Search"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +153,7 @@ export default function Header() {
         {/* Mobile Search Bar (Directly below header row) */}
         <div className="mt-2.5 md:hidden">
           <form action="/search" method="GET" className="flex w-full">
-            <div className="flex w-full bg-gray-50 rounded-lg overflow-hidden border border-gray-300 focus-within:border-brandRed focus-within:ring-1 focus-within:ring-brandRed transition-all">
+            <div className="flex w-full bg-gray-50 rounded-lg overflow-hidden border border-gray-300 focus-within:border-calreeGreen focus-within:ring-1 focus-within:ring-calreeGreen transition-all">
               <div className="pl-3 flex items-center pointer-events-none">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -151,9 +165,20 @@ export default function Header() {
                 className="w-full bg-transparent border-none focus:ring-0 text-xs py-2 px-2.5 outline-none text-gray-800 placeholder-gray-500" 
                 placeholder="Search genuine parts, Toyota, brake pads..." 
               />
+              <button
+                type="button"
+                onClick={() => setIsScannerOpen(true)}
+                title="Scan or Upload Part Photo"
+                className="px-2.5 text-emerald-600 hover:bg-emerald-50 transition flex items-center border-l border-gray-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </button>
               <button 
                 type="submit" 
-                className="bg-brandDark text-white px-3.5 hover:bg-brandRed transition flex items-center justify-center text-xs font-semibold"
+                className="bg-brandDark text-white px-3.5 hover:bg-calreeGreen hover:text-slate-950 transition flex items-center justify-center text-xs font-semibold"
               >
                 Search
               </button>
@@ -190,6 +215,16 @@ export default function Header() {
           <ul className="flex space-x-8 ml-6 text-sm font-medium text-gray-700 h-full items-center">
             <li><a href="/" className="text-brandRed border-b-2 border-brandRed pb-[14px] pt-4 block font-bold">Home</a></li>
             <li><a href="/search" className="hover:text-brandRed transition block py-4 font-bold text-brandDark">Parts</a></li>
+            <li>
+              <button
+                type="button"
+                onClick={() => setIsScannerOpen(true)}
+                className="hover:text-emerald-600 transition py-4 flex items-center h-full font-bold text-brandDark gap-1.5"
+              >
+                <span className="w-2 h-2 rounded-full bg-calreeGreen animate-pulse"></span>
+                <span>Scan Part</span>
+              </button>
+            </li>
             <li><a href="/mechanics" className="hover:text-brandRed transition block py-4 font-bold text-brandDark">Find mechanic</a></li>
             <li className="relative group h-full">
               <span className="hover:text-brandRed transition py-4 flex items-center h-full cursor-pointer font-bold text-brandDark">
@@ -317,6 +352,22 @@ export default function Header() {
               >
                 ⚙️ Browse All Spare Parts
               </a>
+              <button
+                type="button"
+                onClick={() => {
+                  closeMenu();
+                  setIsScannerOpen(true);
+                }}
+                className="w-full text-left py-2.5 px-3 rounded-md bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition font-bold flex items-center justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <span>📷</span>
+                  <span>Scan &amp; Match Part</span>
+                </span>
+                <span className="text-[10px] bg-calreeGreen text-slate-950 px-2 py-0.5 rounded font-black">
+                  Camera / Photo
+                </span>
+              </button>
               <a 
                 href="/mechanics" 
                 onClick={closeMenu} 
@@ -438,6 +489,12 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* Global Part Scanner Modal */}
+      <PartScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+      />
     </>
   );
 }

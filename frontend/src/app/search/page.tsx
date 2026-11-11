@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
+import PartScannerModal from '../../components/PartScannerModal';
 
 const DEFAULT_PARTS = [
   { id: 'p1', name: 'Toyota Prado 150 Front Brake Pads (Genuine)', price: 12500, category: 'SUSPENSION', brand: 'Toyota Genuine', condition: 'NEW', seller: 'AutoParts KE', image: '/products/brake-pads.png' },
@@ -26,16 +27,31 @@ export default function SearchPage() {
   const [products, setProducts] = useState<any[]>(DEFAULT_PARTS);
   const [loading, setLoading] = useState(false);
   const [addedItem, setAddedItem] = useState<string | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Read URL query params on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get('category');
-      const q = params.get('keyword');
+      const q = params.get('keyword') || params.get('q');
+      const partNo = params.get('partNumber');
+      const shouldScan = params.get('scan');
+
       if (cat) setSelectedCategory(cat.toUpperCase());
-      if (q) setKeyword(q);
-      fetchProducts(q || '', cat || '');
+      if (partNo) {
+        setKeyword(partNo);
+        fetchProducts(partNo, cat || '');
+      } else if (q) {
+        setKeyword(q);
+        fetchProducts(q, cat || '');
+      } else {
+        fetchProducts('', cat || '');
+      }
+
+      if (shouldScan === 'true') {
+        setIsScannerOpen(true);
+      }
     }
   }, []);
 
@@ -97,21 +113,35 @@ export default function SearchPage() {
             <p className="text-xs text-gray-500 mt-0.5">Explore 100% verified genuine auto components and accessories.</p>
           </div>
 
-          <form onSubmit={handleSearch} className="w-full md:w-1/2 flex bg-gray-50 rounded-xl p-1 border border-gray-200">
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Search parts by name, OEM part #, model, or brand..."
-              className="w-full px-4 py-2 bg-transparent text-sm outline-none font-medium"
-            />
+          <div className="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3">
             <button
-              type="submit"
-              className="bg-brandDark text-white px-6 py-2 rounded-lg font-bold text-xs hover:bg-brandRed transition flex items-center"
+              type="button"
+              onClick={() => setIsScannerOpen(true)}
+              className="w-full sm:w-auto bg-calreeGreen hover:bg-emerald-400 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95 whitespace-nowrap"
             >
-              Search
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Scan / Upload Part</span>
             </button>
-          </form>
+
+            <form onSubmit={handleSearch} className="w-full sm:w-72 md:w-80 flex bg-gray-50 rounded-xl p-1 border border-gray-200">
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search part #, model..."
+                className="w-full px-3 py-1.5 bg-transparent text-sm outline-none font-medium"
+              />
+              <button
+                type="submit"
+                className="bg-brandDark text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-calreeGreen hover:text-slate-950 transition flex items-center"
+              >
+                Search
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Categories Bar */}
@@ -265,6 +295,12 @@ export default function SearchPage() {
         </div>
 
       </div>
+
+      {/* Part Scanner Modal */}
+      <PartScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+      />
     </div>
   );
 }
