@@ -147,6 +147,7 @@ export default function RootLayout({
                   <li><a href="/dashboard/seller" className="hover:text-white transition flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-calreeGreen mr-2"></span>Seller & Vendor Portal</a></li>
                   <li><a href="/dashboard/mechanic" className="hover:text-white transition flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2"></span>Mechanic Workshop Portal</a></li>
                   <li><a href="/dashboard/valuer" className="hover:text-white transition flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2"></span>Valuer Inspection Portal</a></li>
+                  <li><a href="/dashboard/admin" className="hover:text-white transition flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></span>Admin Command Center</a></li>
                   <li><a href="/about" className="hover:text-white transition">About CALREE</a></li>
                   <li><a href="/contact" className="hover:text-white transition">Contact & Customer Support</a></li>
                   <li><a href="/terms" className="hover:text-white transition">Terms & Conditions</a></li>

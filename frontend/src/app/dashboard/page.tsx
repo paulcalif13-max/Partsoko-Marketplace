@@ -25,10 +25,9 @@ export default function Dashboard() {
         {role === 'ADMIN' && (
           <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border border-gray-200">
             <h2 className="text-xl font-semibold mb-4">Admin Controls</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center text-gray-700">Manage Users</div>
-              <div className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center text-gray-700">Global Orders</div>
-              <a href="/dashboard/admin" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">Fee Settings</a>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a href="/dashboard/admin/users" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">👥 Manage Providers & Users</a>
+              <a href="/dashboard/admin" className="p-4 border rounded cursor-pointer hover:bg-gray-50 text-center block text-primary font-medium">⚙️ Admin Command Center & Bug Tickets</a>
             </div>
           </div>
         )}
