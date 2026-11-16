@@ -52,6 +52,7 @@ export default function AdminDashboard() {
   const [sendEmail, setSendEmail] = useState(true);
   const [isSendingQuote, setIsSendingQuote] = useState(false);
   const [actionNotice, setActionNotice] = useState('');
+  const [bugReports, setBugReports] = useState<any[]>([]);
 
   useEffect(() => {
     // Load current settings from backend
@@ -60,6 +61,14 @@ export default function AdminDashboard() {
       .then(data => {
         if (data.commissionPercent) setCommission(data.commissionPercent);
         if (data.importTaxPercent) setTax(data.importTaxPercent);
+      })
+      .catch(() => {});
+
+    // Load reported bugs and issue tickets
+    fetch('/api/bugs/report')
+      .then(res => res.json())
+      .then(data => {
+        if (data.reports) setBugReports(data.reports);
       })
       .catch(() => {});
   }, []);
@@ -248,6 +257,53 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* User Reported Issues & Bug Tickets */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-brandDark">User Reported Issues &amp; Bug Tickets</h2>
+                <span className="text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">
+                  {bugReports.filter(b => b.status !== 'RESOLVED').length} Active
+                </span>
+              </div>
+              <span className="text-xs text-gray-400">Live Client Feedback</span>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {bugReports.length === 0 ? (
+                <div className="p-8 text-center text-xs text-gray-400">
+                  No active issue reports. System running smoothly.
+                </div>
+              ) : (
+                bugReports.map((report) => (
+                  <div key={report.id} className="p-5 hover:bg-gray-50/50 transition">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-gray-400">{report.id}</span>
+                          <h4 className="text-sm font-extrabold text-slate-900">{report.title}</h4>
+                        </div>
+                        <p className="text-xs text-slate-600 mt-1.5 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                          {report.description}
+                        </p>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${
+                        report.status === 'RESOLVED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {report.status}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-[10px] text-gray-400 pt-2 border-t border-gray-50">
+                      <span>URL: <span className="text-emerald-700 font-mono">{report.url}</span></span>
+                      <span>&bull;</span>
+                      <span>Logged: {new Date(report.createdAt).toLocaleString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

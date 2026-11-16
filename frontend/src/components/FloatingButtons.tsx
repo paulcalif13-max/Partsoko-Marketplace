@@ -9,6 +9,8 @@ export default function FloatingButtons() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+  const [ticketId, setTicketId] = useState<string | null>(null);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -31,13 +33,11 @@ export default function FloatingButtons() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        setTicketId(data.reportId || `BUG-${Date.now().toString().slice(-6)}`);
         setSubmitStatus('success');
         setBugTitle('');
         setBugDesc('');
-        setTimeout(() => {
-          setIsBugModalOpen(false);
-          setSubmitStatus('idle');
-        }, 2000);
       } else {
         setSubmitStatus('error');
       }
@@ -92,10 +92,42 @@ export default function FloatingButtons() {
             
             <div className="p-6">
               {submitStatus === 'success' ? (
-                <div className="text-center py-8 text-green-600">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  <p className="font-bold text-lg">Report Sent Successfully!</p>
-                  <p className="text-sm text-gray-500 mt-2">Our tech team has been notified.</p>
+                <div className="text-center py-6 text-emerald-600 space-y-3">
+                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                    ✓
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-base text-slate-900">Issue Logged Successfully!</p>
+                    {ticketId && (
+                      <p className="text-xs font-mono font-bold bg-slate-100 text-slate-800 py-1 px-3 rounded-full inline-block mt-1">
+                        Ticket: {ticketId}
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto">
+                    Your issue has been logged in the CALREE Command Center for engineering review.
+                  </p>
+
+                  <div className="pt-2 flex flex-col gap-2">
+                    <a
+                      href={`https://wa.me/254702420404?text=Habari%20CALREE%2C%20following%20up%20on%20issue%20ticket%20${ticketId || ''}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full bg-[#25D366] hover:bg-green-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition shadow-sm flex items-center justify-center gap-1.5"
+                    >
+                      <span>💬 Chat with Support on WhatsApp</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsBugModalOpen(false);
+                        setSubmitStatus('idle');
+                      }}
+                      className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl transition"
+                    >
+                      Close Window
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleBugReport} className="space-y-4">
