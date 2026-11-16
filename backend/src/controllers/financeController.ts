@@ -7,19 +7,39 @@ import { AuthRequest } from '../middleware/authMiddleware';
 // @access  Public / Authenticated
 export const submitFinanceApplication = async (req: Request, res: Response) => {
   try {
-    const { applicantName, phone, email, productType, requestedAmount, tenureMonths, vehicleData, userId } = req.body;
+    const {
+      applicantName,
+      fullName,
+      name,
+      phone,
+      phoneNumber,
+      email,
+      productType,
+      serviceType,
+      requestedAmount,
+      amount,
+      amountRequested,
+      tenureMonths,
+      vehicleData,
+      userId
+    } = req.body;
 
-    if (!applicantName || !phone || !productType || !requestedAmount) {
-      return res.status(400).json({ message: 'Missing required financing application details' });
+    const applicant = (applicantName || fullName || name || '').trim();
+    const contactPhone = (phone || phoneNumber || '').trim();
+    const prodType = (productType || serviceType || 'PARTS_FINANCE').trim();
+    const reqAmount = Number(requestedAmount || amount || amountRequested);
+
+    if (!applicant || !contactPhone || !reqAmount || isNaN(reqAmount)) {
+      return res.status(400).json({ message: 'Missing required financing application details (name, phone, amount)' });
     }
 
     const application = await prisma.financeApplication.create({
       data: {
-        applicantName,
-        phone,
+        applicantName: applicant,
+        phone: contactPhone,
         email: email || null,
-        productType,
-        requestedAmount: Number(requestedAmount),
+        productType: prodType,
+        requestedAmount: reqAmount,
         tenureMonths: tenureMonths ? Number(tenureMonths) : 12,
         vehicleData: vehicleData || null,
         userId: userId || null,
@@ -27,10 +47,27 @@ export const submitFinanceApplication = async (req: Request, res: Response) => {
       }
     });
 
+    const referenceCode = `FIN-${application.id.substring(0, 6).toUpperCase()}`;
+
+    // WhatsApp confirmation URL
+    const whatsappMsg = encodeURIComponent(
+      `Habari CALREE, I have submitted a Financing Application.\n\n` +
+      `*Reference Code:* ${referenceCode}\n` +
+      `*Applicant:* ${applicant}\n` +
+      `*Phone:* ${contactPhone}\n` +
+      `*Amount:* KES ${reqAmount.toLocaleString()}\n` +
+      `*Facility:* ${prodType}\n\n` +
+      `Please verify and guide on the next appraisal steps.`
+    );
+    const whatsappUrl = `https://wa.me/254702420404?text=${whatsappMsg}`;
+
     res.status(201).json({
-      message: 'Financing application received',
+      success: true,
+      message: 'Financing application received successfully',
+      referenceCode,
       application,
-      referenceCode: `FIN-${application.id.substring(0, 6).toUpperCase()}`
+      whatsappUrl,
+      supportWhatsApp: '+254 702 420 404'
     });
   } catch (error) {
     console.error('Error in submitFinanceApplication:', error);

@@ -7,28 +7,55 @@ import { AuthRequest } from '../middleware/authMiddleware';
 // @access  Public
 export const submitValuation = async (req: Request, res: Response) => {
   try {
-    const { customerName, customerPhone, vehicleReg, makeModel, year, vin, location, purpose, userId } = req.body;
+    const {
+      customerName,
+      clientName,
+      name,
+      customerPhone,
+      clientPhone,
+      phone,
+      vehicleReg,
+      vehicleRegistration,
+      registrationNumber,
+      makeModel,
+      vehicleMakeModel,
+      model,
+      year,
+      vehicleYear,
+      vin,
+      location,
+      preferredLocation,
+      purpose,
+      valuationPurpose,
+      userId
+    } = req.body;
 
-    if (!vehicleReg || !makeModel || !year || !location) {
-      return res.status(400).json({ message: 'Missing required vehicle valuation details' });
+    const vReg = (vehicleReg || vehicleRegistration || registrationNumber || '').trim();
+    const vModel = (makeModel || vehicleMakeModel || model || '').trim();
+    const vYear = year || vehicleYear || 2018;
+    const vLoc = (location || preferredLocation || 'Nairobi').trim();
+
+    if (!vReg || !vModel) {
+      return res.status(400).json({ message: 'Missing required vehicle valuation details (registration and model)' });
     }
 
     const valuation = await prisma.valuationRequest.create({
       data: {
-        customerName: customerName || null,
-        customerPhone: customerPhone || null,
-        vehicleReg,
-        makeModel,
-        year: parseInt(year.toString()),
+        customerName: customerName || clientName || name || null,
+        customerPhone: customerPhone || clientPhone || phone || null,
+        vehicleReg: vReg,
+        makeModel: vModel,
+        year: parseInt(vYear.toString()),
         vin: vin || null,
-        location,
-        purpose: purpose || 'general',
+        location: vLoc,
+        purpose: purpose || valuationPurpose || 'general',
         userId: userId || null,
         status: 'PENDING'
       }
     });
 
     res.status(201).json({
+      success: true,
       message: 'Valuation appointment scheduled successfully',
       valuation,
       referenceCode: `VAL-${valuation.id.substring(0, 6).toUpperCase()}`

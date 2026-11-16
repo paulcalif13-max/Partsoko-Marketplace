@@ -7,6 +7,7 @@ import { protect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
+router.post('/', submitFinanceApplication);
 router.post('/apply', submitFinanceApplication);
 router.get('/my-applications', protect, getMyFinanceApplications);
 

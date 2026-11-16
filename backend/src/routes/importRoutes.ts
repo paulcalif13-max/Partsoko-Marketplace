@@ -10,6 +10,7 @@ import { protect, authorize } from '../middleware/authMiddleware';
 const router = express.Router();
 
 router.post('/', submitImportRequest);
+router.post('/request', submitImportRequest);
 router.get('/my-requests', protect, getMyImportRequests);
 router.get('/admin', protect, authorize('ADMIN'), getAdminImportRequests);
 router.put('/:id/quote', protect, authorize('ADMIN'), updateImportQuote);

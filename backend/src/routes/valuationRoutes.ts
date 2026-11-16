@@ -9,6 +9,7 @@ import { protect, authorize } from '../middleware/authMiddleware';
 const router = express.Router();
 
 router.post('/', submitValuation);
+router.post('/request', submitValuation);
 router.get('/valuer', protect, authorize('VALUER', 'ADMIN'), getValuerJobs);
 router.put('/:id/report', protect, authorize('VALUER', 'ADMIN'), submitValuationReport);
 

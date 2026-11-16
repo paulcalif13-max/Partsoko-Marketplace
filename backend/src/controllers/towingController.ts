@@ -7,21 +7,40 @@ import { AuthRequest } from '../middleware/authMiddleware';
 // @access  Public
 export const requestTowing = async (req: Request, res: Response) => {
   try {
-    const { customerName, customerPhone, pickupLocation, destination, vehicleReg, vehicleModel, providerName, fare, userId } = req.body;
+    const {
+      customerName,
+      contactName,
+      name,
+      customerPhone,
+      contactPhone,
+      phone,
+      pickupLocation,
+      location,
+      destination,
+      vehicleReg,
+      registrationNumber,
+      vehicleType,
+      vehicleModel,
+      providerName,
+      fare,
+      userId
+    } = req.body;
 
-    if (!customerName || !customerPhone || !pickupLocation || !destination || !vehicleReg) {
-      return res.status(400).json({ message: 'Missing required towing details' });
-    }
+    const cName = (customerName || contactName || name || 'Motorist in Need').trim();
+    const cPhone = (customerPhone || contactPhone || phone || '+254702420404').trim();
+    const pLoc = (pickupLocation || location || 'Nairobi Area').trim();
+    const dest = (destination || 'Nearest Authorized Garage').trim();
+    const vReg = (vehicleReg || registrationNumber || vehicleType || 'Vehicle').trim();
 
     const towing = await prisma.towingRequest.create({
       data: {
-        customerName,
-        customerPhone,
-        pickupLocation,
-        destination,
-        vehicleReg,
+        customerName: cName,
+        customerPhone: cPhone,
+        pickupLocation: pLoc,
+        destination: dest,
+        vehicleReg: vReg,
         vehicleModel: vehicleModel || null,
-        providerName: providerName || 'Rapid Response Recovery',
+        providerName: providerName || 'CALREE Emergency Recovery',
         fare: fare ? Number(fare) : 3500,
         userId: userId || null,
         status: 'PENDING'
@@ -29,6 +48,7 @@ export const requestTowing = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({
+      success: true,
       message: 'Tow truck dispatched successfully',
       towing,
       referenceCode: `TOW-${towing.id.substring(0, 6).toUpperCase()}`
