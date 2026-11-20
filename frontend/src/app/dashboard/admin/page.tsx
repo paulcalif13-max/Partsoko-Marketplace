@@ -53,6 +53,14 @@ export default function AdminDashboard() {
   const [isSendingQuote, setIsSendingQuote] = useState(false);
   const [actionNotice, setActionNotice] = useState('');
   const [bugReports, setBugReports] = useState<any[]>([]);
+  const [lastIssuedQuote, setLastIssuedQuote] = useState<{
+    quoteNumber: string;
+    email: string;
+    emailSent: boolean;
+    transportInfo: string;
+    htmlPreview: string;
+  } | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
     // Load current settings from backend
@@ -61,6 +69,16 @@ export default function AdminDashboard() {
       .then(data => {
         if (data.commissionPercent) setCommission(data.commissionPercent);
         if (data.importTaxPercent) setTax(data.importTaxPercent);
+      })
+      .catch(() => {});
+
+    // Load live import sourcing requests from API
+    fetch('/api/imports/request')
+      .then(res => res.json())
+      .then(data => {
+        if (data.requests && Array.isArray(data.requests)) {
+          setImportRequests(data.requests);
+        }
       })
       .catch(() => {});
 
@@ -112,8 +130,9 @@ export default function AdminDashboard() {
     setIsSendingQuote(true);
 
     try {
+      let quoteData: any = null;
       if (sendEmail && recipientEmail && recipientEmail.includes('@')) {
-        await fetch('/api/quotes/email', {
+        const quoteRes = await fetch('/api/quotes/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -137,8 +156,37 @@ export default function AdminDashboard() {
           })
         });
 
-        setActionNotice(`Official CALREE quotation dispatched to ${recipientEmail}! ✓`);
-        setTimeout(() => setActionNotice(''), 4000);
+        quoteData = await quoteRes.json();
+
+        // Update request in backend store
+        await fetch('/api/imports/request', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeImport.id,
+            status: 'QUOTED',
+            totalQuoted: total,
+            itemEst: Number(fobPrice) || 0,
+            dutyEst: Number(duty) || 0,
+            email: recipientEmail
+          })
+        });
+
+        if (quoteData && quoteData.htmlPreview) {
+          setLastIssuedQuote({
+            quoteNumber: quoteData.quoteNumber || `CAL-${activeImport.id}`,
+            email: recipientEmail,
+            emailSent: quoteData.emailSent,
+            transportInfo: quoteData.transportInfo,
+            htmlPreview: quoteData.htmlPreview
+          });
+        }
+
+        if (quoteData && quoteData.emailSent) {
+          setActionNotice(`Official CALREE quotation dispatched to ${recipientEmail}! ✓`);
+        } else {
+          setActionNotice(`Official quotation generated for ${recipientEmail}. Click "View Quotation Letter" to inspect or print.`);
+        }
       }
     } catch (err) {
       console.error('Failed to email quote from admin:', err);
@@ -174,9 +222,22 @@ export default function AdminDashboard() {
       </div>
 
       {actionNotice && (
-        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl font-bold text-xs flex items-center justify-between animate-fade-in">
-          <span>{actionNotice}</span>
-          <button onClick={() => setActionNotice('')} className="text-emerald-700">✕</button>
+        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl font-bold text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center space-x-2">
+            <span>{actionNotice}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            {lastIssuedQuote && (
+              <button
+                type="button"
+                onClick={() => setIsPreviewOpen(true)}
+                className="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-800 transition shadow-sm"
+              >
+                👁️ View Quotation Letter
+              </button>
+            )}
+            <button onClick={() => setActionNotice('')} className="text-emerald-700 px-1 hover:text-emerald-900">✕</button>
+          </div>
         </div>
       )}
 
@@ -453,6 +514,56 @@ export default function AdminDashboard() {
                 {isSendingQuote ? 'Generating & Sending Official Quote...' : 'Issue & Send Official CALREE Quote'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quotation HTML Preview Modal */}
+      {isPreviewOpen && lastIssuedQuote && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-4xl w-full h-[90vh] shadow-2xl flex flex-col overflow-hidden border border-gray-100">
+            <div className="bg-slate-950 px-6 py-4 flex justify-between items-center text-white border-b border-gray-800">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-lg bg-calreeGreen text-slate-950 font-black flex items-center justify-center text-lg">
+                  C
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base">Official CALREE Quotation Preview</h3>
+                  <p className="text-xs text-gray-400">{lastIssuedQuote.quoteNumber} &bull; {lastIssuedQuote.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const iframe = document.getElementById('quotation-preview-frame') as HTMLIFrameElement;
+                    if (iframe && iframe.contentWindow) {
+                      iframe.contentWindow.print();
+                    }
+                  }}
+                  className="bg-calreeGreen text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-400 transition"
+                >
+                  🖨️ Print / Save PDF
+                </button>
+                <button onClick={() => setIsPreviewOpen(false)} className="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+              </div>
+            </div>
+            
+            <div className="bg-amber-50 px-6 py-2.5 border-b border-amber-200 text-amber-900 text-xs flex justify-between items-center">
+              <span>
+                <strong>Delivery Status:</strong> {lastIssuedQuote.emailSent ? 'Dispatched via live SMTP server' : 'Generated in verified preview mode (Requires Google App Password in .env.local for external inbox delivery)'}
+              </span>
+              <span className="font-mono text-[11px] text-amber-700">{lastIssuedQuote.transportInfo}</span>
+            </div>
+
+            <div className="flex-1 bg-gray-100 p-4 overflow-auto">
+              <iframe
+                id="quotation-preview-frame"
+                srcDoc={lastIssuedQuote.htmlPreview}
+                title="Quotation Preview"
+                className="w-full h-full bg-white rounded-xl shadow-inner border border-gray-200"
+              />
+            </div>
           </div>
         </div>
       )}

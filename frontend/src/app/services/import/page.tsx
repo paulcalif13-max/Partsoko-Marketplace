@@ -15,6 +15,8 @@ export default function ImportQuotePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [referenceCode, setReferenceCode] = useState('');
+  const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [emailNotice, setEmailNotice] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +40,19 @@ export default function ImportQuotePage() {
 
       const data = await res.json();
       if (res.ok) {
-        setReferenceCode(data.referenceCode || `PSK-IMP-${Date.now().toString().slice(-6)}`);
+        setReferenceCode(data.referenceCode || `CAL-IMP-${Date.now().toString().slice(-6)}`);
+        if (data.whatsappUrl) setWhatsappUrl(data.whatsappUrl);
+        if (data.emailSent) {
+          setEmailNotice(`Acknowledgment email dispatched to ${customerEmail}.`);
+        } else if (data.transportInfo) {
+          setEmailNotice(`Acknowledgment recorded for ${customerEmail}.`);
+        }
       } else {
-        setReferenceCode(`PSK-IMP-${Date.now().toString().slice(-6)}`);
+        setReferenceCode(`CAL-IMP-${Date.now().toString().slice(-6)}`);
       }
       setSubmitted(true);
     } catch (err) {
-      setReferenceCode(`PSK-IMP-${Date.now().toString().slice(-6)}`);
+      setReferenceCode(`CAL-IMP-${Date.now().toString().slice(-6)}`);
       setSubmitted(true);
     } finally {
       setIsSubmitting(false);
@@ -91,15 +99,32 @@ export default function ImportQuotePage() {
                 <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Your Tracking Reference</p>
                 <p className="text-xl font-black text-primary mt-1">{referenceCode}</p>
               </div>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto text-sm">
+              <p className="text-gray-600 mb-4 max-w-md mx-auto text-sm">
                 Our sourcing experts in Nairobi are verifying the supplier, customs duties, air/sea freight, and fitment for your vehicle. We will send a consolidated landed quote with official CALREE details to <span className="font-bold text-brandDark">{customerEmail ? `${customerEmail} and ${customerPhone}` : customerPhone}</span>.
               </p>
-              <button 
-                onClick={() => setSubmitted(false)}
-                className="bg-brandDark text-white px-8 py-3 rounded-full font-bold hover:bg-gray-800 transition text-sm"
-              >
-                Submit Another Request
-              </button>
+              {emailNotice && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-lg p-2.5 max-w-sm mx-auto mb-4">
+                  ✉️ {emailNotice}
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+                {whatsappUrl && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full font-bold transition text-xs flex items-center gap-2 shadow-sm"
+                  >
+                    💬 Chat with Sourcing Desk on WhatsApp
+                  </a>
+                )}
+                <button 
+                  onClick={() => setSubmitted(false)}
+                  className="bg-brandDark text-white px-6 py-3 rounded-full font-bold hover:bg-gray-800 transition text-xs"
+                >
+                  Submit Another Request
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
