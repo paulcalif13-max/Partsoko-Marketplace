@@ -122,7 +122,10 @@ export async function POST(request: Request) {
       const smtpUser = process.env.SMTP_USER;
       const rawPass = process.env.SMTP_PASS || '';
       const smtpPass = rawPass.replace(/\s+/g, '').trim();
-      const fromAddress = process.env.SMTP_FROM || smtpUser || 'support@calree.co.ke';
+      const rawFrom = process.env.SMTP_FROM || smtpUser || 'paulcalif13@gmail.com';
+      const fromHeader = rawFrom.includes('<') && rawFrom.includes('>')
+        ? rawFrom
+        : `"CALREE Import Desk" <${rawFrom}>`;
 
       const emailHtml = generateImportAcknowledgmentHtml({
         referenceCode,
@@ -147,7 +150,7 @@ export async function POST(request: Request) {
           });
 
           const info = await transporter.sendMail({
-            from: `"CALREE Import Desk" <${fromAddress}>`,
+            from: fromHeader,
             to: email,
             replyTo: 'support@calree.co.ke',
             subject: `Import Sourcing Request Received [${referenceCode}] - CALREE Kenya`,

@@ -62,7 +62,10 @@ export async function POST(request: Request) {
     const smtpUser = process.env.SMTP_USER;
     const rawPass = process.env.SMTP_PASS || '';
     const smtpPass = rawPass.replace(/\s+/g, '').trim();
-    const fromAddress = process.env.SMTP_FROM || smtpUser || 'support@calree.co.ke';
+    const rawFrom = process.env.SMTP_FROM || smtpUser || 'paulcalif13@gmail.com';
+    const fromHeader = rawFrom.includes('<') && rawFrom.includes('>')
+      ? rawFrom
+      : `"CALREE Official" <${rawFrom}>`;
 
     let emailSent = false;
     let transportInfo = '';
@@ -80,7 +83,7 @@ export async function POST(request: Request) {
         });
 
         const info = await transporter.sendMail({
-          from: `"CALREE Official" <${fromAddress}>`,
+          from: fromHeader,
           to: clientEmail,
           replyTo: 'support@calree.co.ke',
           subject: `Official CALREE Quotation [${quoteNumber}] - Better parts. Smoother journeys.`,

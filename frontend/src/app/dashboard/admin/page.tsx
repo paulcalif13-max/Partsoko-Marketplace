@@ -251,9 +251,9 @@ export default function AdminDashboard() {
         }
 
         if (quoteData && quoteData.emailSent) {
-          setActionNotice(`Official CALREE quotation dispatched to ${recipientEmail}! ✓`);
+          setActionNotice(`Official CALREE quotation successfully sent to ${recipientEmail}! ✓`);
         } else {
-          setActionNotice(`Official quotation generated for ${recipientEmail}. Click "View Quotation Letter" to inspect or print.`);
+          setActionNotice(`Notice for ${recipientEmail}: ${quoteData?.transportInfo || 'Generated in preview mode'}. Click "View Quotation Letter" to inspect.`);
         }
       }
     } catch (err) {
