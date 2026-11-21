@@ -97,7 +97,8 @@ export async function POST(request: Request) {
       const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
       const smtpPort = Number(process.env.SMTP_PORT) || 465;
       const smtpUser = process.env.SMTP_USER;
-      const smtpPass = process.env.SMTP_PASS;
+      const rawPass = process.env.SMTP_PASS || '';
+      const smtpPass = rawPass.replace(/\s+/g, '').trim();
       const fromAddress = process.env.SMTP_FROM || smtpUser || 'support@calree.co.ke';
 
       const emailHtml = generateImportAcknowledgmentHtml({

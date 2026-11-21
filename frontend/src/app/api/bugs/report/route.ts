@@ -62,7 +62,8 @@ export async function POST(request: Request) {
     const supportEmail = process.env.SUPPORT_EMAIL || 'support@calree.co.ke';
     const smtpHost = process.env.SMTP_HOST;
     const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
+    const rawPass = process.env.SMTP_PASS || '';
+    const smtpPass = rawPass.replace(/\s+/g, '').trim();
 
     if (smtpHost && smtpUser && smtpPass && smtpPass !== 'your_gmail_app_password') {
       try {
