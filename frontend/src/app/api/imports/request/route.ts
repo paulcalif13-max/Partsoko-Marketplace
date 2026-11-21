@@ -20,6 +20,19 @@ export interface ImportDeskItem {
 // In-memory store for import requests (shared between client submissions & Admin Sourcing Desk)
 const IMPORT_REQUESTS: ImportDeskItem[] = [
   {
+    id: 'CAL-IMP-YWBJJY',
+    url: 'https://www.ebay.com/itm/324892000890?_skw=discovery+brake+caliper',
+    vehicle: 'Landrover Discovery 2007',
+    customer: 'Paul Muthoni',
+    phone: '0702420404',
+    email: 'paulmuthoni2001@gmail.com',
+    notes: 'Front brake caliper assembly OEM',
+    status: 'RECEIVED',
+    itemEst: 24050,
+    dutyEst: 13500,
+    createdAt: new Date().toISOString(),
+  },
+  {
     id: 'IMP-101',
     url: 'https://www.ebay.com/itm/3248920192',
     vehicle: '2016 Land Rover Defender TD5',
@@ -28,6 +41,8 @@ const IMPORT_REQUESTS: ImportDeskItem[] = [
     email: 'kimani@example.com',
     notes: 'Turbocharger actuator assembly',
     status: 'RECEIVED',
+    itemEst: 49400,
+    dutyEst: 24500,
     createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
   },
   {
@@ -39,6 +54,8 @@ const IMPORT_REQUESTS: ImportDeskItem[] = [
     email: 'purchasing@autotech.co.ke',
     notes: 'Denso Common Rail injector kit (x4)',
     status: 'QUOTED',
+    itemEst: 31200,
+    dutyEst: 16500,
     totalQuoted: 54000,
     createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
   }
@@ -74,6 +91,10 @@ export async function POST(request: Request) {
 
     const referenceCode = `CAL-IMP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
+    // Auto-calculate initial FOB baseline so admin modal is never blank
+    const initialFob = 24050;
+    const initialDuty = 13500;
+
     const newRequest: ImportDeskItem = {
       id: referenceCode,
       url: link,
@@ -83,6 +104,8 @@ export async function POST(request: Request) {
       email,
       notes,
       status: 'RECEIVED',
+      itemEst: initialFob,
+      dutyEst: initialDuty,
       createdAt: new Date().toISOString(),
     };
 

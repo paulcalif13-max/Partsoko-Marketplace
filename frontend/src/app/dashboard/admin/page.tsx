@@ -9,6 +9,7 @@ interface ImportDeskItem {
   customer: string;
   phone: string;
   email?: string;
+  notes?: string;
   status: string;
   itemEst?: number;
   dutyEst?: number;
@@ -61,6 +62,11 @@ export default function AdminDashboard() {
     htmlPreview: string;
   } | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isFetchingPrice, setIsFetchingPrice] = useState(false);
+  const [priceDetectionBadge, setPriceDetectionBadge] = useState<{
+    text: string;
+    type: 'success' | 'estimate' | 'error';
+  } | null>(null);
 
   useEffect(() => {
     // Load current settings from backend
@@ -116,10 +122,72 @@ export default function AdminDashboard() {
     return (Number(fobPrice) || 0) + (Number(freight) || 0) + (Number(duty) || 0) + (Number(serviceFee) || 0);
   };
 
+  const triggerPriceDetection = async (targetUrl?: string, vehicleInfo?: string, notesInfo?: string) => {
+    const urlToFetch = targetUrl || activeImport?.url;
+    if (!urlToFetch) return;
+
+    setIsFetchingPrice(true);
+
+    try {
+      const res = await fetch('/api/imports/fetch-price', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: urlToFetch,
+          vehicle: vehicleInfo || activeImport?.vehicle,
+          notes: notesInfo || activeImport?.notes,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setFobPrice(String(data.fobKes));
+        if (data.estimatedDuty) {
+          setDuty(String(data.estimatedDuty));
+        }
+
+        if (data.isEstimated) {
+          setPriceDetectionBadge({
+            text: `Estimated from catalog: $${data.originalPrice} USD → KES ${data.fobKes.toLocaleString()}`,
+            type: 'estimate',
+          });
+        } else {
+          setPriceDetectionBadge({
+            text: `✨ Detected from ${data.detectedVendor}: $${data.originalPrice} ${data.currency} → KES ${data.fobKes.toLocaleString()} (@ ${data.exchangeRate} KES/${data.currency})`,
+            type: 'success',
+          });
+        }
+      } else {
+        setPriceDetectionBadge({
+          text: data.message || 'Could not auto-detect price. Please enter manually.',
+          type: 'error',
+        });
+      }
+    } catch (err: any) {
+      setPriceDetectionBadge({
+        text: 'Price detection offline. Please enter manually.',
+        type: 'error',
+      });
+    } finally {
+      setIsFetchingPrice(false);
+    }
+  };
+
   const handleOpenQuoteModal = (req: ImportDeskItem) => {
     setActiveImport(req);
     setRecipientEmail(req.email || '');
     setFobPrice(req.itemEst ? String(req.itemEst) : '');
+    setDuty(req.dutyEst ? String(req.dutyEst) : '12000');
+    setPriceDetectionBadge(null);
+
+    if (req.itemEst) {
+      setPriceDetectionBadge({
+        text: `⚡ Pre-priced: KES ${Number(req.itemEst).toLocaleString()} (approx. $${Math.round(req.itemEst / 130)} USD)`,
+        type: 'success'
+      });
+    } else if (req.url) {
+      triggerPriceDetection(req.url, req.vehicle, req.notes);
+    }
   };
 
   const handleIssueQuote = async (e: React.FormEvent) => {
@@ -284,6 +352,11 @@ export default function AdminDashboard() {
                       <p className="text-xs font-bold text-emerald-700 mt-0.5">{req.vehicle}</p>
                       {req.email && (
                         <p className="text-[11px] text-gray-500 mt-0.5">Email: <span className="font-mono">{req.email}</span></p>
+                      )}
+                      {req.itemEst && req.status !== 'QUOTED' && (
+                        <span className="inline-block mt-1 text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">
+                          ⚡ Auto-detected FOB: KES {req.itemEst.toLocaleString()}
+                        </span>
                       )}
                     </div>
 
@@ -458,23 +531,69 @@ export default function AdminDashboard() {
             <form onSubmit={handleIssueQuote} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Supplier FOB Price (KES) *</label>
-                  <input required type="number" value={fobPrice} onChange={e => setFobPrice(e.target.value)} placeholder="e.g. 25000" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-gray-700">Supplier FOB (KES) *</label>
+                    <button
+                      type="button"
+                      onClick={() => triggerPriceDetection()}
+                      disabled={isFetchingPrice}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded transition disabled:opacity-50"
+                      title="Re-scrape and detect price from link"
+                    >
+                      {isFetchingPrice ? (
+                        <>
+                          <span className="w-2.5 h-2.5 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin inline-block"></span>
+                          <span>Scanning...</span>
+                        </>
+                      ) : (
+                        <span>⚡ Auto-Detect</span>
+                      )}
+                    </button>
+                  </div>
+                  <input 
+                    required 
+                    type="number" 
+                    value={fobPrice} 
+                    onChange={e => setFobPrice(e.target.value)} 
+                    placeholder="e.g. 24050" 
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-brandDark focus:ring-1 focus:ring-calreeGreen outline-none" 
+                  />
+                  {priceDetectionBadge && (
+                    <div className={`mt-1.5 text-[10px] font-semibold p-1.5 rounded-lg leading-tight ${
+                      priceDetectionBadge.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                      priceDetectionBadge.type === 'estimate' ? 'bg-blue-50 text-blue-800 border border-blue-200' :
+                      'bg-amber-50 text-amber-800 border border-amber-200'
+                    }`}>
+                      {priceDetectionBadge.text}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Air / Sea Freight (KES) *</label>
-                  <input required type="number" value={freight} onChange={e => setFreight(e.target.value)} placeholder="8500" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
+                  <input required type="number" value={freight} onChange={e => setFreight(e.target.value)} placeholder="8500" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-brandDark" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">KRA Duty & RDL (KES) *</label>
-                  <input required type="number" value={duty} onChange={e => setDuty(e.target.value)} placeholder="12000" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-gray-700">KRA Duty & RDL (KES) *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const calculated = Math.round(((Number(fobPrice) || 0) + (Number(freight) || 8500)) * 0.42 / 500) * 500;
+                        setDuty(String(calculated || 12000));
+                      }}
+                      className="text-[10px] text-gray-500 hover:text-emerald-700 font-semibold underline"
+                    >
+                      Auto-Duty
+                    </button>
+                  </div>
+                  <input required type="number" value={duty} onChange={e => setDuty(e.target.value)} placeholder="12000" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-brandDark" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">CALREE Fee (KES) *</label>
-                  <input required type="number" value={serviceFee} onChange={e => setServiceFee(e.target.value)} placeholder="4500" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm" />
+                  <input required type="number" value={serviceFee} onChange={e => setServiceFee(e.target.value)} placeholder="4500" className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-brandDark" />
                 </div>
               </div>
 
