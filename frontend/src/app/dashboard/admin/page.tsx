@@ -57,6 +57,10 @@ export default function AdminDashboard() {
   const [lastIssuedQuote, setLastIssuedQuote] = useState<{
     quoteNumber: string;
     email: string;
+    clientName?: string;
+    clientPhone?: string;
+    vehicleInfo?: string;
+    totalAmount?: number;
     emailSent: boolean;
     transportInfo: string;
     htmlPreview: string;
@@ -82,6 +86,17 @@ export default function AdminDashboard() {
     AED: 35.3,
     CNY: 18.2,
     KES: 1.0,
+  };
+
+  const formatWhatsAppQuoteUrl = (phone: string, customer: string, vehicle: string, quoteRef: string, total: number, email?: string) => {
+    let cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '254' + cleanPhone.slice(1);
+    } else if (!cleanPhone.startsWith('254') && cleanPhone.length === 9) {
+      cleanPhone = '254' + cleanPhone;
+    }
+    const message = `Hello ${customer || 'Valued Client'},\n\nThis is CALREE Global Parts Concierge. Your official landed quotation for *${vehicle}* has been prepared:\n\n📋 *Quotation Ref:* ${quoteRef}\n💵 *Total Landed Cost:* KES ${Number(total).toLocaleString()}\n\n✅ *Included in this quote:*\n• Overseas supplier FOB purchase\n• International air/sea freight to Nairobi\n• KRA customs duty clearance & import fees\n• Direct delivery dispatch\n\n${email ? `Official quotation breakdown has also been emailed to: ${email}\n` : ''}Please reply to this message to confirm order placement and dispatch.\n\n*CALREE Logistics Team*`;
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
   };
 
   useEffect(() => {
@@ -316,6 +331,10 @@ export default function AdminDashboard() {
           setLastIssuedQuote({
             quoteNumber: quoteData.quoteNumber || `CAL-${activeImport.id}`,
             email: recipientEmail,
+            clientName: activeImport.customer,
+            clientPhone: activeImport.phone,
+            vehicleInfo: activeImport.vehicle,
+            totalAmount: total,
             emailSent: quoteData.emailSent,
             transportInfo: quoteData.transportInfo,
             htmlPreview: quoteData.htmlPreview
@@ -323,9 +342,9 @@ export default function AdminDashboard() {
         }
 
         if (quoteData && quoteData.emailSent) {
-          setActionNotice(`Official CALREE quotation successfully sent to ${recipientEmail}! ✓`);
+          setActionNotice(`Official CALREE quotation (${quoteData.quoteNumber || 'CAL-' + activeImport.id}) dispatched to ${recipientEmail} via Google Mail! ✓`);
         } else {
-          setActionNotice(`Notice for ${recipientEmail}: ${quoteData?.transportInfo || 'Generated in preview mode'}. Click "View Quotation Letter" to inspect.`);
+          setActionNotice(`Notice for ${recipientEmail}: ${quoteData?.transportInfo || 'Generated in preview mode'}. Click "View Quotation Letter" or share via WhatsApp.`);
         }
       }
     } catch (err) {
@@ -362,21 +381,44 @@ export default function AdminDashboard() {
       </div>
 
       {actionNotice && (
-        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl font-bold text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
-          <div className="flex items-center space-x-2">
-            <span>{actionNotice}</span>
+        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl font-bold text-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-fade-in shadow-xs">
+          <div className="flex items-start md:items-center space-x-2">
+            <span className="text-base">✉️</span>
+            <div>
+              <p className="font-extrabold text-emerald-950">{actionNotice}</p>
+              <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                Tip: First-time automated emails often route to the recipient's <strong>Spam</strong> or <strong>Promotions</strong> folder. Advise client to mark as &ldquo;Not Spam&rdquo; or forward the official summary directly to their phone.
+              </p>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-wrap gap-2">
+            {lastIssuedQuote && lastIssuedQuote.clientPhone && (
+              <a
+                href={formatWhatsAppQuoteUrl(
+                  lastIssuedQuote.clientPhone,
+                  lastIssuedQuote.clientName || 'Client',
+                  lastIssuedQuote.vehicleInfo || 'Vehicle Part',
+                  lastIssuedQuote.quoteNumber,
+                  lastIssuedQuote.totalAmount || 0,
+                  lastIssuedQuote.email
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition shadow-sm flex items-center gap-1.5"
+              >
+                <span>📲 Share on WhatsApp</span>
+              </a>
+            )}
             {lastIssuedQuote && (
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(true)}
-                className="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-800 transition shadow-sm"
+                className="bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-900 transition shadow-sm"
               >
                 👁️ View Quotation Letter
               </button>
             )}
-            <button onClick={() => setActionNotice('')} className="text-emerald-700 px-1 hover:text-emerald-900">✕</button>
+            <button onClick={() => setActionNotice('')} className="text-emerald-700 px-1 hover:text-emerald-900 text-base font-bold">✕</button>
           </div>
         </div>
       )}
@@ -453,7 +495,24 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  <div className="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+                  <div className="flex justify-end items-center space-x-2 pt-2 border-t border-gray-100 flex-wrap gap-2">
+                    {req.status === 'QUOTED' && req.totalQuoted && (
+                      <a
+                        href={formatWhatsAppQuoteUrl(
+                          req.phone,
+                          req.customer,
+                          req.vehicle,
+                          `CAL-${req.id}`,
+                          req.totalQuoted,
+                          req.email
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 transition shadow-sm flex items-center gap-1.5"
+                      >
+                        <span>📲 Share via WhatsApp</span>
+                      </a>
+                    )}
                     <button
                       onClick={() => handleOpenQuoteModal(req)}
                       className="bg-calreeGreen text-slate-950 px-4 py-2 rounded-xl text-xs font-black hover:bg-emerald-400 transition shadow-sm active:scale-95"
@@ -734,8 +793,11 @@ export default function AdminDashboard() {
                   value={recipientEmail} 
                   onChange={e => setRecipientEmail(e.target.value)} 
                   placeholder="e.g. client@company.com" 
-                  className="w-full p-2 bg-white border border-gray-200 rounded-lg text-xs" 
+                  className="w-full p-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-brandDark" 
                 />
+                <p className="text-[10px] text-gray-500 leading-tight">
+                  Dispatches via Google SMTP (paulcalif13@gmail.com). Email will be saved in your Gmail <strong>Sent</strong> folder.
+                </p>
               </div>
 
               <div className="bg-slate-900 text-white p-4 rounded-xl flex justify-between items-center border border-slate-800">
@@ -759,7 +821,7 @@ export default function AdminDashboard() {
       {isPreviewOpen && lastIssuedQuote && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-fade-in">
           <div className="bg-white rounded-3xl max-w-4xl w-full h-[90vh] shadow-2xl flex flex-col overflow-hidden border border-gray-100">
-            <div className="bg-slate-950 px-6 py-4 flex justify-between items-center text-white border-b border-gray-800">
+            <div className="bg-slate-950 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center text-white border-b border-gray-800 gap-3">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-lg bg-calreeGreen text-slate-950 font-black flex items-center justify-center text-lg">
                   C
@@ -769,7 +831,24 @@ export default function AdminDashboard() {
                   <p className="text-xs text-gray-400">{lastIssuedQuote.quoteNumber} &bull; {lastIssuedQuote.email}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 flex-wrap gap-2">
+                {lastIssuedQuote.clientPhone && (
+                  <a
+                    href={formatWhatsAppQuoteUrl(
+                      lastIssuedQuote.clientPhone,
+                      lastIssuedQuote.clientName || 'Client',
+                      lastIssuedQuote.vehicleInfo || 'Vehicle Part',
+                      lastIssuedQuote.quoteNumber,
+                      lastIssuedQuote.totalAmount || 0,
+                      lastIssuedQuote.email
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700 transition flex items-center gap-1.5 shadow-sm"
+                  >
+                    <span>📲 Send via WhatsApp ({lastIssuedQuote.clientPhone})</span>
+                  </a>
+                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -786,11 +865,11 @@ export default function AdminDashboard() {
               </div>
             </div>
             
-            <div className="bg-amber-50 px-6 py-2.5 border-b border-amber-200 text-amber-900 text-xs flex justify-between items-center">
+            <div className="bg-emerald-50 px-6 py-2.5 border-b border-emerald-200 text-emerald-950 text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <span>
-                <strong>Delivery Status:</strong> {lastIssuedQuote.emailSent ? 'Dispatched via live SMTP server' : 'Generated in verified preview mode (Requires Google App Password in .env.local for external inbox delivery)'}
+                <strong>Delivery Status:</strong> {lastIssuedQuote.emailSent ? 'Dispatched via Google SMTP (paulcalif13@gmail.com). Check Gmail Sent folder. (If not in recipient inbox, ask customer to check Spam/Promotions).' : 'Generated in verified preview mode.'}
               </span>
-              <span className="font-mono text-[11px] text-amber-700">{lastIssuedQuote.transportInfo}</span>
+              <span className="font-mono text-[11px] text-emerald-800">{lastIssuedQuote.transportInfo}</span>
             </div>
 
             <div className="flex-1 bg-gray-100 p-4 overflow-auto">

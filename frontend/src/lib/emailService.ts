@@ -57,7 +57,8 @@ export function getMailTransporter(): Transporter | null {
  * Core email dispatcher with verified fallback and consistent logging.
  */
 export async function sendCalreeEmail(options: BaseEmailOptions): Promise<EmailSendResult> {
-  const { to, subject, html, text, replyTo = 'support@calree.co.ke', category = 'GENERAL' } = options;
+  const defaultReplyTo = process.env.SMTP_USER || 'paulcalif13@gmail.com';
+  const { to, subject, html, text, replyTo = defaultReplyTo, category = 'GENERAL' } = options;
 
   if (!to || !to.includes('@')) {
     console.warn(`[CALREE EMAIL - ${category}] Invalid recipient email address: "${to}"`);
