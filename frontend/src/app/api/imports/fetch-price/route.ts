@@ -3,33 +3,56 @@ import { NextResponse } from 'next/server';
 // Standard currency exchange rates to Kenyan Shillings (KES)
 const FX_RATES_TO_KES: Record<string, number> = {
   USD: 129.5,
+  AUD: 85.5,
+  CAD: 94.2,
   EUR: 141.0,
   GBP: 167.0,
   JPY: 0.86,
   AED: 35.3,
   CNY: 18.2,
+  ZAR: 7.2,
   KES: 1.0,
 };
-
-// Fallback catalog estimations for common vehicle parts when external scraping is captcha-blocked
-const PART_CATEGORY_ESTIMATES_USD: Array<{ keywords: string[]; avgUsd: number; dutyRate: number }> = [
-  { keywords: ['caliper', 'brake caliper', 'brake system'], avgUsd: 185, dutyRate: 0.45 },
-  { keywords: ['shock', 'strut', 'absorber', 'suspension', 'air spring'], avgUsd: 220, dutyRate: 0.45 },
-  { keywords: ['turbo', 'turbocharger', 'actuator'], avgUsd: 380, dutyRate: 0.45 },
-  { keywords: ['ecu', 'computer', 'module', 'sensor', 'sensor assembly'], avgUsd: 190, dutyRate: 0.35 },
-  { keywords: ['alternator', 'starter', 'starter motor'], avgUsd: 160, dutyRate: 0.40 },
-  { keywords: ['headlight', 'headlamp', 'lamp', 'taillight'], avgUsd: 175, dutyRate: 0.45 },
-  { keywords: ['radiator', 'condenser', 'intercooler', 'cooling'], avgUsd: 140, dutyRate: 0.40 },
-  { keywords: ['injector', 'fuel injector', 'fuel pump'], avgUsd: 240, dutyRate: 0.35 },
-  { keywords: ['steering rack', 'rack and pinion', 'power steering'], avgUsd: 310, dutyRate: 0.45 },
-  { keywords: ['gearbox', 'transmission', 'differential'], avgUsd: 650, dutyRate: 0.50 },
-  { keywords: ['engine', 'cylinder head', 'crankshaft', 'block'], avgUsd: 950, dutyRate: 0.50 },
-];
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { url, vehicle = '', notes = '' } = body;
+    const { url, vehicle = '', notes = '', manualPrice, manualCurrency } = body;
+
+    // Direct manual conversion mode (e.g. admin types AU $112.67 or enters price + currency)
+    if (manualPrice !== undefined && manualPrice !== null && manualPrice !== '') {
+      const rawStr = String(manualPrice).trim();
+      let detectedCurr = (manualCurrency || 'USD').toUpperCase();
+
+      // Check if currency symbol or code is embedded in manualPrice string
+      if (/AU\s*\$|AUD/i.test(rawStr)) detectedCurr = 'AUD';
+      else if (/C\s*\$|CAD/i.test(rawStr)) detectedCurr = 'CAD';
+      else if (/US\s*\$|USD|\$/i.test(rawStr)) detectedCurr = 'USD';
+      else if (/€|EUR/i.test(rawStr)) detectedCurr = 'EUR';
+      else if (/£|GBP/i.test(rawStr)) detectedCurr = 'GBP';
+      else if (/¥|JPY/i.test(rawStr)) detectedCurr = 'JPY';
+      else if (/AED/i.test(rawStr)) detectedCurr = 'AED';
+      else if (/CNY|RMB/i.test(rawStr)) detectedCurr = 'CNY';
+
+      const numericVal = parseFloat(rawStr.replace(/[^0-9.]/g, ''));
+      if (!isNaN(numericVal) && numericVal > 0) {
+        const rate = FX_RATES_TO_KES[detectedCurr] || FX_RATES_TO_KES.USD;
+        const fobKes = Math.round(numericVal * rate);
+        const estimatedDuty = Math.round((fobKes + 8500) * 0.42 / 500) * 500;
+
+        return NextResponse.json({
+          success: true,
+          fobKes,
+          originalPrice: numericVal,
+          currency: detectedCurr,
+          exchangeRate: rate,
+          estimatedDuty,
+          detectedVendor: 'Manual Currency Converter',
+          isEstimated: false,
+          message: `Converted ${numericVal.toFixed(2)} ${detectedCurr} at ${rate} KES/${detectedCurr} → KES ${fobKes.toLocaleString()}`,
+        });
+      }
+    }
 
     if (!url || typeof url !== 'string' || !url.startsWith('http')) {
       return NextResponse.json(
@@ -51,10 +74,10 @@ export async function POST(request: Request) {
     let extractedPrice: number | null = null;
     let extractedCurrency: string = 'USD';
     let productTitle: string = '';
-    let isEstimated = false;
     let htmlContent = '';
+    let fetchStatus = 0;
 
-    // Step 1: Attempt direct HTTP fetch with realistic browser headers
+    // Step 1: Attempt direct HTTP fetch
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6500);
@@ -63,14 +86,14 @@ export async function POST(request: Request) {
         signal: controller.signal,
         headers: {
           'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
           Accept:
             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.9',
-          'Cache-Control': 'no-cache',
         },
       });
       clearTimeout(timeoutId);
+      fetchStatus = res.status;
 
       if (res.ok) {
         htmlContent = await res.text();
@@ -129,48 +152,40 @@ export async function POST(request: Request) {
         }
       }
 
-      // 2D: Platform-specific patterns
+      // 2D: Platform-specific patterns (including AU $, C $, US $, etc.)
       if (!extractedPrice) {
-        // eBay patterns: e.g. "US $145.00" or item-price
-        const ebayMatch = htmlContent.match(/itemprop=["']price["']\s+content=["']([0-9.]+)["']/i) ||
-          htmlContent.match(/class=["'][^"']*x-price-primary[^"']*["'][^>]*>[\s\S]*?([$€£¥])\s*([0-9,.]+)/i) ||
-          htmlContent.match(/([$€£¥]|USD|EUR|GBP|JPY)\s*([0-9]+(?:\.[0-9]{2})?)/i);
-
-        if (ebayMatch) {
-          const val = ebayMatch[2] || ebayMatch[1];
-          const currSymbol = ebayMatch[1];
-          extractedPrice = parseFloat(String(val).replace(/,/g, ''));
-          if (currSymbol === '€') extractedCurrency = 'EUR';
-          else if (currSymbol === '£') extractedCurrency = 'GBP';
-          else if (currSymbol === '¥') extractedCurrency = 'JPY';
-          else if (currSymbol === '$' || currSymbol === 'USD') extractedCurrency = 'USD';
+        // Multi-currency price matchers
+        const multiCurrMatch = htmlContent.match(/(AU\s*\$|AUD|C\s*\$|CAD|US\s*\$|USD|[$€£¥])\s*([0-9]+(?:\.[0-9]{2})?)/i);
+        if (multiCurrMatch) {
+          const rawSymbol = multiCurrMatch[1].toUpperCase();
+          extractedPrice = parseFloat(multiCurrMatch[2]);
+          if (rawSymbol.includes('AU')) extractedCurrency = 'AUD';
+          else if (rawSymbol.includes('C')) extractedCurrency = 'CAD';
+          else if (rawSymbol === '€') extractedCurrency = 'EUR';
+          else if (rawSymbol === '£') extractedCurrency = 'GBP';
+          else if (rawSymbol === '¥') extractedCurrency = 'JPY';
+          else extractedCurrency = 'USD';
         }
       }
     }
 
-    // Step 3: Fallback Heuristic Estimation if site blocks direct scraping (Alibaba/Amazon botwall)
+    // Step 3: Handle when scraping is blocked (e.g. Akamai 403 on eBay or captcha)
     if (!extractedPrice || isNaN(extractedPrice) || extractedPrice <= 0) {
-      isEstimated = true;
-      const combinedText = `${vehicle} ${notes} ${url}`.toLowerCase();
-      let matchedEstimate = PART_CATEGORY_ESTIMATES_USD.find((cat) =>
-        cat.keywords.some((kw) => combinedText.includes(kw))
-      );
-
-      // Default baseline if no specific part keyword matched
-      const fallbackUsd = matchedEstimate ? matchedEstimate.avgUsd : 160;
-      extractedPrice = fallbackUsd;
-      extractedCurrency = 'USD';
-      if (!productTitle) {
-        productTitle = vehicle ? `Import Genuine OEM Parts (${vehicle})` : 'Import Automotive Replacement Part';
-      }
+      return NextResponse.json({
+        success: false,
+        blocked: true,
+        detectedVendor,
+        fetchStatus,
+        message: `${detectedVendor} blocked direct price extraction (${fetchStatus === 403 ? 'Anti-bot protection 403' : 'No price tags found'}). Please check the supplier's tab and enter their listed price in the currency converter.`,
+        rates: FX_RATES_TO_KES,
+      });
     }
 
-    // Step 4: Currency Conversion to KES
+    // Step 4: Currency Conversion to KES using real exchange rate
     const rate = FX_RATES_TO_KES[extractedCurrency] || FX_RATES_TO_KES.USD;
     const fobKes = Math.round(extractedPrice * rate);
 
-    // Step 5: Recommended KRA Customs Duty calculation (~45% of CIF)
-    // Standard CIF: FOB + ~8,500 freight. Duty approx 45% of CIF
+    // Step 5: Recommended KRA Customs Duty calculation (~42% of CIF)
     const estimatedDuty = Math.round((fobKes + 8500) * 0.42 / 500) * 500;
 
     return NextResponse.json({
@@ -182,10 +197,8 @@ export async function POST(request: Request) {
       estimatedDuty,
       productTitle: productTitle || `${vehicle} Sourced Part`,
       detectedVendor,
-      isEstimated,
-      message: isEstimated
-        ? `Estimated baseline calculated from automotive catalog for ${vehicle || 'part'}. You can adjust if needed.`
-        : `Successfully detected live price from ${detectedVendor} ($${extractedPrice} ${extractedCurrency}) converted at ${rate} KES/${extractedCurrency}.`,
+      isEstimated: false,
+      message: `✨ Detected live price from ${detectedVendor}: ${extractedPrice.toFixed(2)} ${extractedCurrency} → KES ${fobKes.toLocaleString()} (Rate: ${rate} KES/${extractedCurrency}).`,
     });
   } catch (error: any) {
     console.error('Error in /api/imports/fetch-price:', error);

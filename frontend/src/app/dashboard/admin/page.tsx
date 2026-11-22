@@ -68,6 +68,22 @@ export default function AdminDashboard() {
     type: 'success' | 'estimate' | 'error';
   } | null>(null);
 
+  // Supplier multi-currency converter state
+  const [supplierPriceInput, setSupplierPriceInput] = useState('');
+  const [supplierCurrency, setSupplierCurrency] = useState('AUD');
+
+  const FX_RATES: Record<string, number> = {
+    AUD: 85.5,
+    USD: 129.5,
+    GBP: 167.0,
+    EUR: 141.0,
+    CAD: 94.2,
+    JPY: 0.86,
+    AED: 35.3,
+    CNY: 18.2,
+    KES: 1.0,
+  };
+
   useEffect(() => {
     // Load current settings from backend
     fetch('/api/admin/settings')
@@ -122,6 +138,44 @@ export default function AdminDashboard() {
     return (Number(fobPrice) || 0) + (Number(freight) || 0) + (Number(duty) || 0) + (Number(serviceFee) || 0);
   };
 
+  const handleConvertSupplierPrice = (rawInput: string, currencyCode: string) => {
+    setSupplierPriceInput(rawInput);
+    if (!rawInput.trim()) {
+      setPriceDetectionBadge(null);
+      return;
+    }
+
+    let detectedCurr = currencyCode;
+    // Check if user pasted e.g. "AU $112.67", "US $74.68", "£50", etc.
+    if (/AU\s*\$|AUD/i.test(rawInput)) detectedCurr = 'AUD';
+    else if (/C\s*\$|CAD/i.test(rawInput)) detectedCurr = 'CAD';
+    else if (/US\s*\$|USD/i.test(rawInput)) detectedCurr = 'USD';
+    else if (/€|EUR/i.test(rawInput)) detectedCurr = 'EUR';
+    else if (/£|GBP/i.test(rawInput)) detectedCurr = 'GBP';
+    else if (/¥|JPY/i.test(rawInput)) detectedCurr = 'JPY';
+    else if (/AED/i.test(rawInput)) detectedCurr = 'AED';
+    else if (/CNY/i.test(rawInput)) detectedCurr = 'CNY';
+
+    setSupplierCurrency(detectedCurr);
+
+    const numeric = parseFloat(rawInput.replace(/[^0-9.]/g, ''));
+    if (!isNaN(numeric) && numeric > 0) {
+      const rate = FX_RATES[detectedCurr] || 129.5;
+      const convertedKes = Math.round(numeric * rate);
+      setFobPrice(String(convertedKes));
+
+      // Auto-compute KRA duty recommendation: ~42% of CIF (FOB + Freight)
+      const currentFreight = Number(freight) || 8500;
+      const autoDuty = Math.round(((convertedKes + currentFreight) * 0.42) / 500) * 500;
+      setDuty(String(autoDuty));
+
+      setPriceDetectionBadge({
+        text: `✨ Converted: ${numeric.toFixed(2)} ${detectedCurr} → KES ${convertedKes.toLocaleString()} (Rate: ${rate} KES/${detectedCurr}) • Recommended Duty: KES ${autoDuty.toLocaleString()}`,
+        type: 'success',
+      });
+    }
+  };
+
   const triggerPriceDetection = async (targetUrl?: string, vehicleInfo?: string, notesInfo?: string) => {
     const urlToFetch = targetUrl || activeImport?.url;
     if (!urlToFetch) return;
@@ -142,30 +196,29 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (res.ok && data.success) {
         setFobPrice(String(data.fobKes));
+        if (data.originalPrice) {
+          setSupplierPriceInput(String(data.originalPrice));
+        }
+        if (data.currency) {
+          setSupplierCurrency(data.currency);
+        }
         if (data.estimatedDuty) {
           setDuty(String(data.estimatedDuty));
         }
 
-        if (data.isEstimated) {
-          setPriceDetectionBadge({
-            text: `Estimated from catalog: $${data.originalPrice} USD → KES ${data.fobKes.toLocaleString()}`,
-            type: 'estimate',
-          });
-        } else {
-          setPriceDetectionBadge({
-            text: `✨ Detected from ${data.detectedVendor}: $${data.originalPrice} ${data.currency} → KES ${data.fobKes.toLocaleString()} (@ ${data.exchangeRate} KES/${data.currency})`,
-            type: 'success',
-          });
-        }
+        setPriceDetectionBadge({
+          text: `✨ Verified from ${data.detectedVendor}: ${data.originalPrice} ${data.currency} → KES ${data.fobKes.toLocaleString()} (@ ${data.exchangeRate} KES/${data.currency})`,
+          type: 'success',
+        });
       } else {
         setPriceDetectionBadge({
-          text: data.message || 'Could not auto-detect price. Please enter manually.',
+          text: data.message || 'Supplier page blocked automated reading. Check supplier tab and enter price (e.g. AU $112.67) in the converter above.',
           type: 'error',
         });
       }
     } catch (err: any) {
       setPriceDetectionBadge({
-        text: 'Price detection offline. Please enter manually.',
+        text: 'Price detection offline. Enter supplier price in currency converter above.',
         type: 'error',
       });
     } finally {
@@ -176,17 +229,36 @@ export default function AdminDashboard() {
   const handleOpenQuoteModal = (req: ImportDeskItem) => {
     setActiveImport(req);
     setRecipientEmail(req.email || '');
-    setFobPrice(req.itemEst ? String(req.itemEst) : '');
-    setDuty(req.dutyEst ? String(req.dutyEst) : '12000');
-    setPriceDetectionBadge(null);
+    setSupplierPriceInput('');
 
-    if (req.itemEst) {
+    // Pre-detect currency from supplier URL
+    const urlLower = (req.url || '').toLowerCase();
+    if (urlLower.includes('.au') || urlLower.includes('ebay.com.au')) {
+      setSupplierCurrency('AUD');
+    } else if (urlLower.includes('.co.uk') || urlLower.includes('ebay.co.uk')) {
+      setSupplierCurrency('GBP');
+    } else if (urlLower.includes('partsouq')) {
+      setSupplierCurrency('AED');
+    } else if (urlLower.includes('amayama') || urlLower.includes('.jp')) {
+      setSupplierCurrency('JPY');
+    } else {
+      setSupplierCurrency('USD');
+    }
+
+    if (req.itemEst && req.itemEst !== 24050) {
+      setFobPrice(String(req.itemEst));
+      setDuty(req.dutyEst ? String(req.dutyEst) : '12000');
       setPriceDetectionBadge({
-        text: `⚡ Pre-priced: KES ${Number(req.itemEst).toLocaleString()} (approx. $${Math.round(req.itemEst / 130)} USD)`,
-        type: 'success'
+        text: `Saved Sourcing Quote: KES ${Number(req.itemEst).toLocaleString()}`,
+        type: 'success',
       });
-    } else if (req.url) {
-      triggerPriceDetection(req.url, req.vehicle, req.notes);
+    } else {
+      setFobPrice('');
+      setDuty('12000');
+      setPriceDetectionBadge(null);
+      if (req.url) {
+        triggerPriceDetection(req.url, req.vehicle, req.notes);
+      }
     }
   };
 
@@ -529,6 +601,52 @@ export default function AdminDashboard() {
             </div>
 
             <form onSubmit={handleIssueQuote} className="p-6 space-y-4">
+              {/* Supplier Link & Foreign Currency Converter */}
+              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                    <span>🌐</span> Real-Time Supplier Currency Converter
+                  </span>
+                  {activeImport.url && (
+                    <a
+                      href={activeImport.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 bg-white border border-emerald-300 hover:bg-emerald-50 px-2.5 py-1 rounded-md flex items-center gap-1 shadow-2xs"
+                    >
+                      <span>Open Supplier Tab ↗</span>
+                    </a>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={supplierPriceInput}
+                    onChange={e => handleConvertSupplierPrice(e.target.value, supplierCurrency)}
+                    placeholder="Enter price on site (e.g. 112.67 or AU $112.67)"
+                    className="flex-1 p-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-slate-900 placeholder:text-gray-400 focus:ring-1 focus:ring-calreeGreen outline-none"
+                  />
+                  <select
+                    value={supplierCurrency}
+                    onChange={e => handleConvertSupplierPrice(supplierPriceInput, e.target.value)}
+                    className="p-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-1 focus:ring-calreeGreen outline-none"
+                  >
+                    <option value="AUD">AUD (AU $ - 85.5 KES)</option>
+                    <option value="USD">USD ($ - 129.5 KES)</option>
+                    <option value="GBP">GBP (£ - 167.0 KES)</option>
+                    <option value="EUR">EUR (€ - 141.0 KES)</option>
+                    <option value="CAD">CAD (C $ - 94.2 KES)</option>
+                    <option value="JPY">JPY (¥ - 0.86 KES)</option>
+                    <option value="AED">AED (35.3 KES)</option>
+                    <option value="CNY">CNY (18.2 KES)</option>
+                  </select>
+                </div>
+                <p className="text-[10px] text-gray-500 mt-1.5">
+                  Type what you see on the supplier site (e.g. AU $112.67 or $74.68). It instantly sets the accurate FOB and recalculates KRA duty.
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -555,7 +673,7 @@ export default function AdminDashboard() {
                     type="number" 
                     value={fobPrice} 
                     onChange={e => setFobPrice(e.target.value)} 
-                    placeholder="e.g. 24050" 
+                    placeholder="e.g. 9650" 
                     className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-brandDark focus:ring-1 focus:ring-calreeGreen outline-none" 
                   />
                   {priceDetectionBadge && (
@@ -582,7 +700,7 @@ export default function AdminDashboard() {
                       type="button"
                       onClick={() => {
                         const calculated = Math.round(((Number(fobPrice) || 0) + (Number(freight) || 8500)) * 0.42 / 500) * 500;
-                        setDuty(String(calculated || 12000));
+                        setDuty(String(calculated > 0 ? calculated : 5000));
                       }}
                       className="text-[10px] text-gray-500 hover:text-emerald-700 font-semibold underline"
                     >

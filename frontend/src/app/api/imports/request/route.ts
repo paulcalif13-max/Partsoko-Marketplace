@@ -90,10 +90,6 @@ export async function POST(request: Request) {
 
     const referenceCode = `CAL-IMP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
-    // Auto-calculate initial FOB baseline so admin modal is never blank
-    const initialFob = 24050;
-    const initialDuty = 13500;
-
     const newRequest: ImportDeskItem = {
       id: referenceCode,
       url: link,
@@ -103,8 +99,8 @@ export async function POST(request: Request) {
       email,
       notes,
       status: 'RECEIVED',
-      itemEst: initialFob,
-      dutyEst: initialDuty,
+      itemEst: undefined,
+      dutyEst: undefined,
       createdAt: new Date().toISOString(),
     };
 
