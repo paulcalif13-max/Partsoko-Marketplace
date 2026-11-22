@@ -9,6 +9,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'card' | 'bank'>('mpesa');
   const [phoneNumber, setPhoneNumber] = useState('254702420404');
   const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [town, setTown] = useState('Nairobi');
 
@@ -20,25 +21,45 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsProcessing(true);
 
+    const ref = `PSK-${Math.floor(100000 + Math.random() * 900000)}`;
+
     try {
-      // Create Order on backend or simulate M-Pesa prompt
-      const res = await fetch('/api/payments/mpesa/stkpush', {
+      // 1. Initiate M-Pesa STK push
+      await fetch('/api/payments/mpesa/stkpush', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           phoneNumber: phoneNumber.replace('+', ''),
           amount: totalAmount,
-          orderId: `ORD-${Date.now()}`
+          orderId: ref
         })
       });
 
-      const ref = `PSK-${Math.floor(100000 + Math.random() * 900000)}`;
+      // 2. Dispatch Official Order Invoice Email to Customer
+      if (customerEmail && customerEmail.includes('@')) {
+        await fetch('/api/orders/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderRef: ref,
+            customerName,
+            customerEmail,
+            customerPhone: phoneNumber,
+            deliveryAddress,
+            town,
+            paymentMethod,
+            items: cart,
+            subtotal,
+            deliveryFee,
+            totalAmount,
+          }),
+        }).catch(e => console.warn('Order email notification error:', e));
+      }
+
       setOrderRef(ref);
       setOrderComplete(true);
       clearCart();
     } catch (err) {
-      // Even if offline, show confirmation for client demo
-      const ref = `PSK-${Math.floor(100000 + Math.random() * 900000)}`;
       setOrderRef(ref);
       setOrderComplete(true);
       clearCart();
@@ -58,9 +79,14 @@ export default function CheckoutPage() {
             Order Confirmed
           </span>
           <h1 className="text-2xl md:text-3xl font-extrabold text-brandDark mb-2">Thank you for your order!</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 mb-2">
             Order Reference: <span className="font-bold text-brandDark">{orderRef}</span>
           </p>
+          {customerEmail && (
+            <p className="text-xs text-primary font-semibold mb-6">
+              📧 An official invoice and receipt has been dispatched to <strong>{customerEmail}</strong>
+            </p>
+          )}
 
           <div className="bg-gray-50 rounded-xl p-4 text-left text-xs space-y-2 mb-6 border border-gray-100">
             <div className="flex justify-between"><span className="text-gray-500">Total Paid:</span> <span className="font-bold text-brandDark">KES {totalAmount.toLocaleString()}</span></div>
@@ -105,7 +131,7 @@ export default function CheckoutPage() {
                 Delivery Details
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
                   <input 
@@ -118,7 +144,18 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Phone Number (M-Pesa enabled) *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Email Address (For Invoices) *</label>
+                  <input 
+                    required 
+                    type="email" 
+                    placeholder="e.g. customer@example.com" 
+                    value={customerEmail}
+                    onChange={e => setCustomerEmail(e.target.value)}
+                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Phone Number (M-Pesa) *</label>
                   <input 
                     required 
                     type="text" 

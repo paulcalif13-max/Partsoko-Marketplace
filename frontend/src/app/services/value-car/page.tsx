@@ -11,6 +11,7 @@ export default function ValueCar() {
   const [purpose, setPurpose] = useState('general');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('0702420404');
+  const [customerEmail, setCustomerEmail] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -32,7 +33,8 @@ export default function ValueCar() {
           location,
           purpose,
           customerName,
-          customerPhone
+          customerPhone,
+          customerEmail,
         })
       });
 
@@ -73,6 +75,11 @@ export default function ValueCar() {
                 <span className="text-xs text-gray-500 uppercase font-bold block">Inspection File Ref</span>
                 <span className="text-lg font-black text-primary">{refCode}</span>
               </div>
+              {customerEmail && (
+                <p className="text-xs text-primary font-semibold mb-3">
+                  📧 Inspection booking confirmation has been sent to <strong>{customerEmail}</strong>
+                </p>
+              )}
               <p className="text-xs text-gray-600 mb-6 leading-relaxed">
                 A licensed valuer has been assigned to inspect <span className="font-bold text-brandDark">{vehicleReg} ({makeModel})</span> in {location}. You will receive a WhatsApp/Call to confirm the inspection timeslot.
               </p>
@@ -161,7 +168,7 @@ export default function ValueCar() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-gray-200">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Contact Name *</label>
                   <input 
@@ -170,6 +177,17 @@ export default function ValueCar() {
                     value={customerName}
                     onChange={e => setCustomerName(e.target.value)}
                     placeholder="Paul Calif" 
+                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Email Address *</label>
+                  <input 
+                    required 
+                    type="email" 
+                    value={customerEmail}
+                    onChange={e => setCustomerEmail(e.target.value)}
+                    placeholder="e.g. owner@example.com" 
                     className="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm" 
                   />
                 </div>

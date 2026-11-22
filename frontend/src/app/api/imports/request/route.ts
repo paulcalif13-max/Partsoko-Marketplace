@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
-import { generateImportAcknowledgmentHtml } from '@/lib/quotationEmailTemplate';
+import { sendImportRequestEmail } from '@/lib/emailService';
 
 export interface ImportDeskItem {
   id: string;
@@ -117,17 +116,7 @@ export async function POST(request: Request) {
     let transportInfo = '';
 
     if (email && email.includes('@')) {
-      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-      const smtpPort = Number(process.env.SMTP_PORT) || 465;
-      const smtpUser = process.env.SMTP_USER;
-      const rawPass = process.env.SMTP_PASS || '';
-      const smtpPass = rawPass.replace(/\s+/g, '').trim();
-      const rawFrom = process.env.SMTP_FROM || smtpUser || 'paulcalif13@gmail.com';
-      const fromHeader = rawFrom.includes('<') && rawFrom.includes('>')
-        ? rawFrom
-        : `"CALREE Import Desk" <${rawFrom}>`;
-
-      const emailHtml = generateImportAcknowledgmentHtml({
+      const result = await sendImportRequestEmail({
         referenceCode,
         customerName: name,
         customerEmail: email,
@@ -137,38 +126,10 @@ export async function POST(request: Request) {
         notes,
       });
 
-      if (smtpUser && smtpPass && smtpPass !== 'your_gmail_app_password') {
-        try {
-          const transporter = nodemailer.createTransport({
-            host: smtpHost,
-            port: smtpPort,
-            secure: smtpPort === 465,
-            auth: {
-              user: smtpUser,
-              pass: smtpPass,
-            },
-          });
-
-          const info = await transporter.sendMail({
-            from: fromHeader,
-            to: email,
-            replyTo: 'support@calree.co.ke',
-            subject: `Import Sourcing Request Received [${referenceCode}] - CALREE Kenya`,
-            text: `Hello ${name},\nWe have received your import request for ${carModel}.\nReference: ${referenceCode}\nOur sourcing desk is computing landed costs. Tel/WhatsApp: +254 702 420 404`,
-            html: emailHtml,
-          });
-
-          emailSent = true;
-          transportInfo = `Acknowledgment email dispatched (${info.messageId})`;
-          console.log(`[CALREE IMPORT] Acknowledgment email sent to ${email} (${info.messageId})`);
-        } catch (err: any) {
-          console.error('[CALREE IMPORT] SMTP error:', err.message);
-          transportInfo = `SMTP fallback: ${err.message}`;
-        }
-      } else {
-        console.log(`[CALREE IMPORT] SMTP credentials not set or in sandbox. Acknowledgment prepared for ${email}: ${referenceCode}`);
-        transportInfo = 'Generated in verified preview mode (ready for live SMTP).';
-      }
+      emailSent = result.success;
+      transportInfo = result.success
+        ? (result.previewMode ? 'Generated in verified preview mode.' : `Acknowledgment email dispatched (${result.messageId})`)
+        : `SMTP fallback: ${result.error}`;
     }
 
     const whatsappMessage = encodeURIComponent(

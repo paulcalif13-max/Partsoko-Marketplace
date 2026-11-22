@@ -13,6 +13,7 @@ export default function TowingService() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
+    email: '',
     location: '',
     destination: '',
     vehicleId: '',
@@ -36,6 +37,7 @@ export default function TowingService() {
         body: JSON.stringify({
           customerName: formData.name,
           customerPhone: formData.phone,
+          customerEmail: formData.email,
           pickupLocation: formData.location,
           destination: formData.destination,
           vehicleReg: formData.vehicleId,
@@ -70,14 +72,18 @@ export default function TowingService() {
             </div>
             
             <form onSubmit={handleSearch} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input required type="text" className="w-full border border-gray-300 rounded-md p-3 focus:ring-primary focus:border-primary" placeholder="Your Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
                   <input required type="text" className="w-full border border-gray-300 rounded-md p-3 focus:ring-primary focus:border-primary" placeholder="e.g. 0702420404" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email (For Rescue Receipt) *</label>
+                  <input required type="email" className="w-full border border-gray-300 rounded-md p-3 focus:ring-primary focus:border-primary" placeholder="e.g. motorist@example.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                 </div>
               </div>
 
@@ -168,6 +174,11 @@ export default function TowingService() {
               <div className="bg-blue-50 text-primary border border-blue-200 text-xs font-bold px-3 py-1 rounded-full inline-block mb-4">
                 Tracking Ref: {towingRef}
               </div>
+            )}
+            {formData.email && (
+              <p className="text-xs text-primary font-semibold mb-3">
+                📧 Rescue dispatch confirmation has been sent to <strong>{formData.email}</strong>
+              </p>
             )}
             <p className="text-lg text-gray-600 mb-8 max-w-lg mx-auto">
               <strong>{selectedProvider.name}</strong> has received your request and is en route to <strong>{formData.location}</strong>.

@@ -293,7 +293,7 @@ export interface ImportAcknowledgmentData {
   customerEmail: string;
   customerPhone?: string;
   vehicle: string;
-  partUrl: string;
+  partUrl?: string;
   notes?: string;
   dateSubmitted?: string;
 }

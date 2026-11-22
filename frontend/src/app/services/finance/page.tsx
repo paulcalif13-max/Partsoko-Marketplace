@@ -100,6 +100,7 @@ export default function FinanceHub() {
       productType: selectedProduct.id,
       requestedAmount: amount,
       tenureMonths: tenure,
+      monthlyInstallment: estimatedMonthlyInstallment,
       vehicleData: {
         registrationNumber: formData.vehicleReg.toUpperCase(),
         makeModel: formData.vehicleMakeModel,
@@ -484,9 +485,14 @@ export default function FinanceHub() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-3 mb-2">
                 Financing Application Submitted!
               </h2>
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-sm text-gray-600 mb-2">
                 Your loan appraisal is currently queued for fast-track review with CALREE lending partners.
               </p>
+              {formData.email && (
+                <p className="text-xs text-primary font-semibold mb-6">
+                  📧 An application summary and appraisal guide has been dispatched to <strong>{formData.email}</strong>
+                </p>
+              )}
 
               {/* Reference Card */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-left mb-6 space-y-3">

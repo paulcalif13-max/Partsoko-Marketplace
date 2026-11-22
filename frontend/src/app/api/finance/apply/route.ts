@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
+import { sendFinanceApplicationEmail } from '@/lib/emailService';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { applicantName, phone, email, productType, requestedAmount, tenureMonths, vehicleData } = body;
+    const {
+      applicantName,
+      phone,
+      email,
+      productType,
+      requestedAmount,
+      tenureMonths,
+      vehicleData,
+      monthlyInstallment,
+    } = body;
 
     if (!applicantName || !phone || !requestedAmount) {
       return NextResponse.json(
@@ -16,12 +26,35 @@ export async function POST(request: Request) {
     const randomHex = Math.random().toString(36).substring(2, 8).toUpperCase();
     const referenceCode = `FIN-${randomHex}`;
 
+    const cleanEmail = (email || '').trim();
+    let emailSent = false;
+    let transportInfo = '';
+
+    if (cleanEmail && cleanEmail.includes('@')) {
+      const result = await sendFinanceApplicationEmail({
+        referenceCode,
+        applicantName,
+        applicantEmail: cleanEmail,
+        phone,
+        productType: productType || 'PARTS_FINANCE',
+        requestedAmount: Number(requestedAmount),
+        tenureMonths: tenureMonths ? Number(tenureMonths) : 12,
+        vehicleReg: vehicleData?.registrationNumber || vehicleData?.vehicleReg,
+        monthlyInstallment: monthlyInstallment ? Number(monthlyInstallment) : undefined,
+      });
+
+      emailSent = result.success;
+      transportInfo = result.success
+        ? (result.previewMode ? 'Generated in verified preview mode.' : `Dispatched via SMTP (${result.messageId})`)
+        : `SMTP fallback: ${result.error}`;
+    }
+
     const applicationRecord = {
       id: `app_${Date.now()}`,
       referenceCode,
       applicantName,
       phone,
-      email: email || null,
+      email: cleanEmail || null,
       productType: productType || 'PARTS_FINANCE',
       requestedAmount: Number(requestedAmount),
       tenureMonths: tenureMonths ? Number(tenureMonths) : 12,
@@ -36,6 +69,7 @@ export async function POST(request: Request) {
       `*Reference Code:* ${referenceCode}\n` +
       `*Applicant:* ${applicantName}\n` +
       `*Phone:* ${phone}\n` +
+      (cleanEmail ? `*Email:* ${cleanEmail}\n` : '') +
       `*Amount:* KES ${Number(requestedAmount).toLocaleString()}\n` +
       `*Vehicle:* ${vehicleData?.registrationNumber || 'Pending'} (${vehicleData?.makeModel || 'N/A'})\n\n` +
       `Please verify and guide on the next steps.`
@@ -48,6 +82,8 @@ export async function POST(request: Request) {
         success: true,
         message: 'Financing application received successfully',
         referenceCode,
+        emailSent,
+        transportInfo,
         application: applicationRecord,
         whatsappUrl,
         adminContact: '+254702420404',

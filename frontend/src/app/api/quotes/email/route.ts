@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import { generateQuotationHtml, QuotationData } from '@/lib/quotationEmailTemplate';
+import { sendQuotationEmail } from '@/lib/emailService';
 
 export async function POST(request: Request) {
   try {
@@ -57,51 +57,11 @@ export async function POST(request: Request) {
 
     const quotationHtml = generateQuotationHtml(quotationData);
 
-    const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-    const smtpPort = Number(process.env.SMTP_PORT) || 465;
-    const smtpUser = process.env.SMTP_USER;
-    const rawPass = process.env.SMTP_PASS || '';
-    const smtpPass = rawPass.replace(/\s+/g, '').trim();
-    const rawFrom = process.env.SMTP_FROM || smtpUser || 'paulcalif13@gmail.com';
-    const fromHeader = rawFrom.includes('<') && rawFrom.includes('>')
-      ? rawFrom
-      : `"CALREE Official" <${rawFrom}>`;
-
-    let emailSent = false;
-    let transportInfo = '';
-
-    if (smtpUser && smtpPass && smtpPass !== 'your_gmail_app_password') {
-      try {
-        const transporter = nodemailer.createTransport({
-          host: smtpHost,
-          port: smtpPort,
-          secure: smtpPort === 465,
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-        });
-
-        const info = await transporter.sendMail({
-          from: fromHeader,
-          to: clientEmail,
-          replyTo: 'support@calree.co.ke',
-          subject: `Official CALREE Quotation [${quoteNumber}] - Better parts. Smoother journeys.`,
-          text: `Official CALREE Quotation ${quoteNumber}\nTotal Due: KES ${quotationData.totalAmount.toLocaleString()}\nPrepared for: ${quotationData.clientName} (${clientEmail})\nView online or reply to confirm order. Tel: +254 702 420 404`,
-          html: quotationHtml,
-        });
-
-        emailSent = true;
-        transportInfo = `Message dispatched via SMTP: ${info.messageId}`;
-        console.log(`[CALREE QUOTES] Email successfully sent to ${clientEmail} (${info.messageId})`);
-      } catch (err: any) {
-        console.error('[CALREE QUOTES] SMTP error, falling back to verified preview mode:', err.message);
-        transportInfo = `SMTP fallback: ${err.message}`;
-      }
-    } else {
-      console.log(`[CALREE QUOTES] SMTP credentials not set or in sandbox. Quotation generated for ${clientEmail}: ${quoteNumber}`);
-      transportInfo = 'Generated in verified preview mode (ready for live SMTP).';
-    }
+    const result = await sendQuotationEmail(quotationData);
+    const emailSent = result.success;
+    const transportInfo = result.success
+      ? (result.previewMode ? 'Generated in verified preview mode.' : `Message dispatched via SMTP: ${result.messageId}`)
+      : `SMTP fallback: ${result.error}`;
 
     return NextResponse.json(
       {
